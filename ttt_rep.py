@@ -215,8 +215,4 @@ class TTT_Board:
     self.state_changed = False 
     return self.printed_board
 
-# Tic Tac Toe Test Suite
-ttt_board = TTT_Board()
-print "Tic Tac Toe\n", ttt_board
-ttt_board.insert("b", 3, "o")
-print "Tic Tac Toe\n", ttt_board
+
