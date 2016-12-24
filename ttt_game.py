@@ -1,9 +1,4 @@
 import ttt_rep
-# Tic Tac Toe Test Suite
-ttt_board = ttt_rep.TTT_Board()
-print "Tic Tac Toe\n", ttt_board
-ttt_board.insert("b", 3, "o")
-print "Tic Tac Toe\n", ttt_board
 
 class TTT_Game:
   def __init__(self):
@@ -22,9 +17,9 @@ class TTT_Game:
     self.turn = not self.turn
 
   def is_over(self):
-    board_rows = board.rows
-    board_cols = board.cols
-    board_diags = board.diags
+    board_rows = self.board.rows
+    board_cols = self.board.cols
+    board_diags = self.board.diags
     for row in board_rows:
       if row.is_complete():
         return True
