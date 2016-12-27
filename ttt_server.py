@@ -1,24 +1,43 @@
 import os
+import sqlite3
 import BaseHTTPServer
 import ttt_game
-from flask import Flask, request, jsonify, abort, current_app
+from flask import Flask, request, session, g, redirect, url_for, render_template, flash, jsonify, abort
 
 app = Flask(__name__)
 
 # HOST = "/kayode-ezike.chatly.io"
-HOST = "/"
+HOST = '/kayode-ezike-ttt.herokuapp.com'
 PORT = 5000
 VERIFICATION_TOKEN = "OTibeqhO18dvugBdlI3eCNHx"
 
 index_path = "/var/www/html/index.html"
 this_game = ttt_game.TTT_Game()
 
+app.config.from_object(__name__) # load config from this file , flaskr.py
+
+# Load default config and override config from an environment variable
+app.config.update(dict(
+  DATABASE=os.path.join(app.root_path, 'ttt.db'),
+  SECRET_KEY='development key',
+  USERNAME='admin',
+  PASSWORD='default'
+))
+app.config.from_envvar('TTT_SETTINGS', silent=True)
+
+def connect_db():
+  """Connects to the specific database."""
+  rv = sqlite3.connect(app.config['DATABASE'])
+  rv.row_factory = sqlite3.Row
+  return rv
+
 # def do_display():
 
 # def do_move():
 
-@app.route(HOST, methods=['POST'])
+@app.route('/')
 def run_ttt():
+  render_template("welcome.html")
   # Parse parameters
   token = request.form.get('token', None)
   command = request.form.get('command', None)
@@ -41,8 +60,8 @@ def run_ttt():
     print "Command is /ttt"
     print "TTT GAME"
     if text == "display":
-      index = open(index_path, 'w')
-      index.write(board.__str__())
+      # index = open(index_path, 'w')
+      # index.write(board.__str__())
       return board.__str__()
 
   # Make a move
@@ -54,6 +73,8 @@ def run_ttt():
     if (0 <= board.file_to_rep(fil) < board.NUM_COLS) and (0 <= board.rank_to_rep(rnk) < board.NUM_ROWS):
       this_game.board.make_move(fil, rnk, 'x')
 
+  else:
+    return "Illegal command!"
 '''
 class TTT_Server(BaseHTTPServer.BaseHTTPRequestHandler):
   def do_POST(self):

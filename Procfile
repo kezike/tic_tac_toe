@@ -1,1 +1,1 @@
-web: python dealscraper/ttt_server.py
+web: python dealscraper/hello.py
