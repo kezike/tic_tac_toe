@@ -35,7 +35,7 @@ def connect_db():
 
 # def do_move():
 
-@app.route(HOST)
+@app.route("/display")
 def run_ttt():
   render_template("welcome.html")
   # Parse parameters
