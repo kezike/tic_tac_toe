@@ -56,7 +56,7 @@ def run_ttt():
   # Confirm user's turn
   # TODO
   # Display board to user
-  if command == "/ttt":
+  if command == "%2Fttt":
     print "Command is /ttt"
     print "TTT GAME"
     if text == "display":
