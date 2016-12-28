@@ -1,1 +1,1 @@
-web: python ttt_server.py
+web: flask run
