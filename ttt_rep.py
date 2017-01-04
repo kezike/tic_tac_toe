@@ -132,7 +132,7 @@ class TTT_Board:
     for j in xrange(self.NUM_COLS):
       self.row_delim += "---"
       if j != self.NUM_COLS - 1:
-        self.row_delim += "+"
+        self.row_delim += '+'
     self.row_delim += '|'
 
     # Cache printed board
@@ -143,14 +143,18 @@ class TTT_Board:
       if len(rank_str) == 1:
         self.printed_board += ' '
       for j in xrange(self.NUM_COLS):
-        self.printed_board += '|   '
+        self.printed_board += '|      '
+        if j == 1:
+          self.printed_board += ' '
         if j == self.NUM_COLS - 1:
           self.printed_board += '|'
           if i != self.NUM_ROWS - 1:
-            self.printed_board += '\n' + "  " + self.row_delim + '\n'
-    file_delim = "   "
-    file_string = "\n "
+            self.printed_board += '\n' + "     " + self.row_delim + '\n'
+    file_delim = "    "
+    file_string = "\n    "
     for j in xrange(self.NUM_COLS):
+      if j == 1:
+        file_delim += '  '
       file_string += file_delim + self.rep_to_fil[j]
     self.printed_board += file_string
     self.state_changed = False
@@ -202,14 +206,18 @@ class TTT_Board:
       if len(rank_str) == 1:
         self.printed_board += ' '
       for j in xrange(self.NUM_COLS):
-        self.printed_board += '| ' + self.get_cell(self.rep_to_file(j), self.rep_to_rank(i)).value + ' '
+        self.printed_board += '|   ' + self.get_cell(self.rep_to_file(j), self.rep_to_rank(i)).value + '   '
+        if j == 1:
+          self.printed_board += ' '
         if j == self.NUM_COLS - 1:
           self.printed_board += '|'
           if i != self.NUM_ROWS - 1:
-            self.printed_board += '\n' + "  " + self.row_delim + '\n'
-    file_delim = "   "
-    file_string = "\n "
+            self.printed_board += '\n' + "     " + self.row_delim + '\n'
+    file_delim = "    "
+    file_string = "\n    "
     for j in xrange(self.NUM_COLS):
+      if j == 1:
+        file_delim += '  '
       file_string += file_delim + self.rep_to_file(j)
     self.printed_board += file_string
     self.state_changed = False 

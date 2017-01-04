@@ -1,49 +1,20 @@
 import os
-import sqlite3
-import BaseHTTPServer
 import ttt_game
 from flask import Flask, request, session, g, redirect, url_for, render_template, flash, jsonify, abort
 
 app = Flask(__name__)
 
-# HOST = "/kayode-ezike.chatly.io"
-HOST = '/kayode-ezike-ttt.herokuapp.com'
+HOST = "/kayode-ezike-ttt.herokuapp.com"
 PORT = 5000
-VERIFICATION_TOKEN = "OTibeqhO18dvugBdlI3eCNHx"
+VERIFICATION_TOKEN="OTibeqhO18dvugBdlI3eCNHx"
 
-index_path = "/var/www/html/index.html"
 this_game = ttt_game.TTT_Game()
 
-app.config.from_object(__name__) # load config from this file , flaskr.py
-
-# Load default config and override config from an environment variable
-app.config.update(dict(
-  DATABASE=os.path.join(app.root_path, 'ttt.db'),
-  SECRET_KEY='development key',
-  USERNAME='admin',
-  PASSWORD='default'
-))
-app.config.from_envvar('TTT_SETTINGS', silent=True)
-
-def connect_db():
-  """Connects to the specific database."""
-  rv = sqlite3.connect(app.config['DATABASE'])
-  rv.row_factory = sqlite3.Row
-  return rv
-
-# def do_display():
-
-# def do_move():
-
-@app.route(HOST, methods=["POST"])
-def run_ttt():
-  render_template("welcome.html")
-  # Parse parameters
+@app.route('/', methods=['POST'])
+def basic_handler():
   token = request.form.get('token', None)
   command = request.form.get('command', None)
-  cmd_input = request.form.get('text', None)
-
-  print "command:", command
+  command_input = request.form.get('text', None)
 
   # Validate parameters
   if not token or token != VERIFICATION_TOKEN:
@@ -56,13 +27,9 @@ def run_ttt():
   # Confirm user's turn
   # TODO
   # Display board to user
-  if command == "%2Fttt":
-    print "Command is /ttt"
-    print "TTT GAME"
-    if text == "display":
-      # index = open(index_path, 'w')
-      # index.write(board.__str__())
-      return board.__str__()
+  if command == "/ttt":
+    if command_input == "display":
+      return "Displaying Board...\n" + board.__str__()
 
   # Make a move
   elif command == "move":
@@ -75,39 +42,10 @@ def run_ttt():
 
   else:
     return "Illegal command!"
-'''
-class TTT_Server(BaseHTTPServer.BaseHTTPRequestHandler):
-  def do_POST(self):
-    # self.send_header("Content-type", "application/json")
-    # self.send_header("Accept", "text/plain")
-    # self.end_headers()
-    self.wfile.write(ttt_game.TTT_Game().board.__str__())
 
-def run_while_true(game, server_class=BaseHTTPServer.HTTPServer,
-                   handler_class=BaseHTTPServer.BaseHTTPRequestHandler):
-  """
-  This assumes that keep_running() is a function of no arguments which
-  is tested initially and after each request.  If its return value
-  is true, the server continues.
-  """
-  server_address = (HOST,PORT)
-  httpd = server_class(server_address, handler_class)
-  while not game.is_over():
-    httpd.handle_request()
+  this_game.board.insert('a', 2, 'o')
+  # return this_game.board.__str__()
 
 if __name__ == "__main__":
-  print this_game.board
-  server_class = BaseHTTPServer.HTTPServer
-  httpd = server_class((HOST, PORT), TTT_Server)
-  print "Server Started At %s:%s" % (HOST, PORT)
-  try:
-    httpd.serve_forever()
-  except KeyboardInterrupt:
-    pass
-  httpd.server_close()
-  print "Server Stopped At %s:%s" % (HOST, PORT)
-'''
-
-if __name__ == "__main__":
-  port = int(os.environ.get("PORT", PORT))
-  app.run(host='0.0.0.0', port=port)
+  port = int(os.environ.get("PORT", 5000))
+  app.run(host='', port=port)
