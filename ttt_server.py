@@ -52,6 +52,7 @@ def ttt_handler():
       # TODO
       if (0 <= board.file_to_rep(fil_str) < board.NUM_COLS) and (0 <= board.rank_to_rep(rnk) < board.NUM_ROWS):
         this_game.make_move(fil_str, rnk, 'x')
+        return board
       else:
         return "Position (FILE, RANK) is out of bounds! Try again."
     elif help_match:
