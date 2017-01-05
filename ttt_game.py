@@ -6,12 +6,6 @@ class TTT_Game:
     self.turn = True
 
   def make_move(self, fil, rnk, val):
-    # assert that it is player's turn
-    if move != self.turn:
-      # TODO - raise warning
-      pass
-    # TODO - assert that this is a valid move
-    # Commit to move
     board.insert(fil, rnk, val)
     # Now opponent's turn
     self.turn = not self.turn

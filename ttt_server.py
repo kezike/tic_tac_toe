@@ -1,4 +1,5 @@
 import os
+import re
 import ttt_game
 from flask import Flask, request, session, g, redirect, url_for, render_template, flash, jsonify, abort
 
@@ -28,23 +29,32 @@ def basic_handler():
   # TODO
   # Display board to user
   if command == "/ttt":
-    if command_input == "display":
-      return "Displaying Board...\n" + board.__str__()
-
-  # Make a move
-  elif command == "move":
-    # verify proper input
-    (fil, rnk) = cmd_input.split(' ')
-    # Check if this valid file and rank
-    # TODO
-    if (0 <= board.file_to_rep(fil) < board.NUM_COLS) and (0 <= board.rank_to_rep(rnk) < board.NUM_ROWS):
-      this_game.board.make_move(fil, rnk, 'x')
-
-  else:
-    return "Illegal command!"
-
-  this_game.board.insert('a', 2, 'o')
-  # return this_game.board.__str__()
+    start_match = re.compile("^start$", command_input)
+    display_match = re.compile("^display$", command_input)
+    move_match = re.match("^move [a-c] [1-3]$", command_input)
+    help_match = re.compile("^help$", command_input)
+    if start_match:
+      # TODO - Check if game already exists for channel
+      # If not, set caller's piece to 'x',
+      # set opponent's piece to 'o', and display board
+      return board
+    elif display_match:
+      return board
+    # Make move
+    elif move_match:
+      # verify proper input
+      (fil, rnk) = cmd_input.split(' ')
+      # Check if this valid file and rank
+      # TODO
+      if (0 <= board.file_to_rep(fil) < board.NUM_COLS) and (0 <= board.rank_to_rep(rnk) < board.NUM_ROWS):
+        this_game.make_move(fil, rnk, 'x')
+      else:
+        return "Position (FILE, RANK) is out of bounds! Try again."
+    elif help_match:
+      manual = open("ttt_manual.txt", 'r')
+      return manual.read()
+    else:
+      return "Illegal command! Type '/ttt help' for legal commands."
 
 if __name__ == "__main__":
   port = int(os.environ.get("PORT", 5000))
