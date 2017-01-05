@@ -1,6 +1,7 @@
 import os
 import re
 import ttt_game
+import ttt_rep
 from flask import Flask, request, session, g, redirect, url_for, render_template, flash, jsonify, abort
 
 app = Flask(__name__)
@@ -40,13 +41,13 @@ def ttt_handler():
       # set opponent's piece to 'o', and display board
       if start_match_flex:
         (start_cmd, dim) = command_input.split(' ')
-        this_game.board = ttt_game.TTT_Board(dim)
+        this_game.board = ttt_rep.TTT_Board(dim)
         board = this_game.board
         # Mainly for setting board.MAX_FILE
         board.set_MAX_FILE(dim)
       else:
         # Default to 3 x 3 dimension
-        this_game.board = ttt_game.TTT_Board(3)
+        this_game.board = ttt_rep.TTT_Board(3)
       return board.__str__()
     elif display_match:
       return board.__str__()
