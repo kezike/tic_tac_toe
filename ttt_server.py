@@ -12,7 +12,7 @@ VERIFICATION_TOKEN="OTibeqhO18dvugBdlI3eCNHx"
 this_game = ttt_game.TTT_Game()
 
 @app.route('/', methods=['POST'])
-def basic_handler():
+def ttt_handler():
   token = request.form.get('token', None)
   command = request.form.get('command', None)
   command_input = request.form.get('text', None)
@@ -44,13 +44,14 @@ def basic_handler():
     elif move_match:
       # verify proper input
       print "COMMAND INPUT:", command_input
-      (cmd_inp_name, fil, rnk) = command_input.split(' ')
-      print "fil:", fil
-      print "rnk:", rnk
+      (cmd_inp_name, fil_str, rnk_str) = command_input.split(' ')
+      rnk = int(rnk_str)
+      print "fil:", fil_str
+      print "rnk:", rnk_str
       # Check if this valid file and rank
       # TODO
-      if (0 <= board.file_to_rep(fil) < board.NUM_COLS) and (0 <= board.rank_to_rep(rnk) < board.NUM_ROWS):
-        this_game.make_move(fil, rnk, 'x')
+      if (0 <= board.file_to_rep(fil_str) < board.NUM_COLS) and (0 <= board.rank_to_rep(rnk) < board.NUM_ROWS):
+        this_game.make_move(fil_str, rnk, 'x')
       else:
         return "Position (FILE, RANK) is out of bounds! Try again."
     elif help_match:
