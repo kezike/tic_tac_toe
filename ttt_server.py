@@ -29,10 +29,10 @@ def basic_handler():
   # TODO
   # Display board to user
   if command == "/ttt":
-    start_match = re.compile("^start$", command_input)
-    display_match = re.compile("^display$", command_input)
+    start_match = re.match("^start$", command_input)
+    display_match = re.match("^display$", command_input)
     move_match = re.match("^move [a-c] [1-3]$", command_input)
-    help_match = re.compile("^help$", command_input)
+    help_match = re.match("^help$", command_input)
     if start_match:
       # TODO - Check if game already exists for channel
       # If not, set caller's piece to 'x',
