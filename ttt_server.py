@@ -37,9 +37,9 @@ def basic_handler():
       # TODO - Check if game already exists for channel
       # If not, set caller's piece to 'x',
       # set opponent's piece to 'o', and display board
-      return board
+      return board.__str__()
     elif display_match:
-      return board
+      return board.__str__()
     # Make move
     elif move_match:
       # verify proper input
