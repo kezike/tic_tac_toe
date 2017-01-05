@@ -79,6 +79,11 @@ class TTT_Board:
   def __init__(self):
     self.NUM_ROWS = 3
     self.NUM_COLS = 3
+    
+    # Turn represented as boolean,
+    # where True = x and False = o
+    self.rep_to_turn = {True: 'x', False: 'o'}
+    self.turn_rep = True
 
     # Stores tic tac toe moves thus far
     # (represented in row major form)
@@ -132,42 +137,29 @@ class TTT_Board:
     for j in xrange(self.NUM_COLS):
       self.row_delim += "---"
       if j != self.NUM_COLS - 1:
-        self.row_delim += '+'
+        self.row_delim += "+"
     self.row_delim += '|'
 
     # Cache printed board
-    # I made changes to this part that may make it seem hard-coded,
-    # but the truth is that due to differences in string output
-    # between command-line and Slack (monospaced vs. "polyspaced").
-    # For now, I store a blank board in a separate file and load it in,
-    # but include the commented original logic for the future, should I
-    # decide to truly scale this application to beyond 3x3, as was my
-    # original intention, given other components of my design (ie. NUM_ROWS, NUM_COLS)
-    """
-    self.printed_board = "Tic Tac Toe\n"
+    # Ticks, underscores, and asterisks are for Slack formatting
+    self.printed_board = "```Play Tic Tac Toe!\n_Turn_: *x*\n"
     for i in xrange(self.NUM_ROWS):
       rank_str = str(self.NUM_ROWS - i)
       self.printed_board += rank_str
       if len(rank_str) == 1:
         self.printed_board += ' '
       for j in xrange(self.NUM_COLS):
-        self.printed_board += '|      '
-        if j == 1:
-          self.printed_board += ' '
+        self.printed_board += '|   '
         if j == self.NUM_COLS - 1:
           self.printed_board += '|'
           if i != self.NUM_ROWS - 1:
-            self.printed_board += '\n' + "     " + self.row_delim + '\n'
-    file_delim = "    "
-    file_string = "\n    "
+            self.printed_board += '\n' + "  " + self.row_delim + '\n'
+    file_delim = "   "
+    file_string = "\n "
     for j in xrange(self.NUM_COLS):
-      if j == 1:
-        file_delim += '  '
       file_string += file_delim + self.rep_to_fil[j]
     self.printed_board += file_string
-    """
-    blank_board = open("ttt_blank_3_x_3.txt", 'r')
-    self.printed_board = blank_board.read()
+    self.printed_board += "```"
     self.state_changed = False
 
   # Converts file to cell index
@@ -193,8 +185,6 @@ class TTT_Board:
     return self.cells[(self.rank_to_rep(rnk) - 1) * self.NUM_COLS + self.file_to_rep(fil) - 1]
 
   def insert(self, fil, rnk, val):
-    # TODO - assert that fil and rnk are valid (may save for higher level)
-    # TODO - assert that (fil, rnk) is within board bounds
     # TODO - assert that piece has not already been inserted at (fil, rnk)
     rank_rep = self.rank_to_rep(rnk)
     file_rep = self.file_to_rep(fil)
@@ -205,39 +195,29 @@ class TTT_Board:
     if rank_rep + file_rep == self.NUM_ROWS - 1:
       self.diags[1].insert(val)
     self.get_cell(fil, rnk).insert(val)    
+    self.turn_rep = not self.turn_rep
     self.state_changed = True
 
   def __str__(self):
     if not self.state_changed:
       return self.printed_board
-    # TODO - Configure following line
-    # to report who's turn it is
-    # Backticks are for formatting
-    # text to be monospaced in Slack
-    self.printed_board = "```\nTic Tac Toe\n"
+    self.printed_board = "```Play Tic Tac Toe!\n_Turn_: *" + self.rep_to_turn[self.turn_rep] + "*\n"
     for i in xrange(self.NUM_ROWS):
       rank_str = str(self.NUM_ROWS - i)
       self.printed_board += rank_str
       if len(rank_str) == 1:
         self.printed_board += ' '
       for j in xrange(self.NUM_COLS):
-        self.printed_board += '|   ' + self.get_cell(self.rep_to_file(j), self.rep_to_rank(i)).value + '   '
-        if j == 1:
-          self.printed_board += ' '
+        self.printed_board += '| ' + self.get_cell(self.rep_to_file(j), self.rep_to_rank(i)).value + ' '
         if j == self.NUM_COLS - 1:
           self.printed_board += '|'
           if i != self.NUM_ROWS - 1:
-            self.printed_board += '\n' + "     " + self.row_delim + '\n'
-    file_delim = "    "
-    file_string = "\n    "
+            self.printed_board += '\n' + "  " + self.row_delim + '\n'
+    file_delim = "   "
+    file_string = "\n "
     for j in xrange(self.NUM_COLS):
-      if j == 1:
-        file_delim += '  '
       file_string += file_delim + self.rep_to_file(j)
     self.printed_board += file_string
-    self.printed_board += "\n```"
+    self.printed_board += "```"
     self.state_changed = False 
     return self.printed_board
-
-board = TTT_Board()
-print board
