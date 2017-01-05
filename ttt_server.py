@@ -45,6 +45,8 @@ def basic_handler():
       # verify proper input
       print "COMMAND INPUT:", command_input
       (cmd_inp_name, fil, rnk) = command_input.split(' ')
+      print "fil:", fil
+      print "rnk:", rnk
       # Check if this valid file and rank
       # TODO
       if (0 <= board.file_to_rep(fil) < board.NUM_COLS) and (0 <= board.rank_to_rep(rnk) < board.NUM_ROWS):
