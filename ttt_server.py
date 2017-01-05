@@ -60,7 +60,7 @@ def ttt_handler():
       return manual.read()
     else:
       return "Illegal command! Type '/ttt help' for legal commands."
-  return "KE"
+  return "OK"
 
 if __name__ == "__main__":
   port = int(os.environ.get("PORT", 5000))

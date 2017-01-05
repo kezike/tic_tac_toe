@@ -136,6 +136,14 @@ class TTT_Board:
     self.row_delim += '|'
 
     # Cache printed board
+    # I made changes to this part that may make it seem hard-coded,
+    # but the truth is that due to differences in string output
+    # between command-line and Slack (monospaced vs. "polyspaced").
+    # For now, I store a blank board in a separate file and load it in,
+    # but include the commented original logic for the future, should I
+    # decide to truly scale this application to beyond 3x3, as was my
+    # original intention, given other components of my design (ie. NUM_ROWS, NUM_COLS)
+    """
     self.printed_board = "Tic Tac Toe\n"
     for i in xrange(self.NUM_ROWS):
       rank_str = str(self.NUM_ROWS - i)
@@ -157,6 +165,9 @@ class TTT_Board:
         file_delim += '  '
       file_string += file_delim + self.rep_to_fil[j]
     self.printed_board += file_string
+    """
+    blank_board = open("ttt_blank_3_x_3.txt", 'r')
+    self.printed_board = blank_board.read()
     self.state_changed = False
 
   # Converts file to cell index
@@ -199,7 +210,11 @@ class TTT_Board:
   def __str__(self):
     if not self.state_changed:
       return self.printed_board
-    self.printed_board = "Tic Tac Toe\n"
+    # TODO - Configure following line
+    # to report who's turn it is
+    # Backticks are for formatting
+    # text to be monospaced in Slack
+    self.printed_board = "```\nTic Tac Toe\n"
     for i in xrange(self.NUM_ROWS):
       rank_str = str(self.NUM_ROWS - i)
       self.printed_board += rank_str
@@ -220,5 +235,9 @@ class TTT_Board:
         file_delim += '  '
       file_string += file_delim + self.rep_to_file(j)
     self.printed_board += file_string
+    self.printed_board += "\n```"
     self.state_changed = False 
     return self.printed_board
+
+board = TTT_Board()
+print board
