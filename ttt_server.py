@@ -34,7 +34,7 @@ def ttt_handler():
   if command == "/ttt":
     start_match = re.match("^start", command_input)
     display_match = re.match("^display$", command_input)
-    move_match = re.match("^move [a-z] ([1-9]|[1-2][0-6])$", command_input)
+    move_match = re.match("^move [a-z] \d+$", command_input)
     help_match = re.match("^help$", command_input)
     if start_match:
       # TODO - Check if game already exists for channel
@@ -65,7 +65,7 @@ def ttt_handler():
       # Check if file and rank globally in bounds (within a-z and 1-26)
       move_bounds_match = re.match("^move [a-z] ([1-9]|[1-2][0-6])$", command_input)
       if not move_bounds_match:
-        return "```Position (FILE, RANK) is out of bounds! a <= FILE <= max(a, min(z, MAX_FILE)), where MAX_FILE is the largest lexicographical letter for the board's dimensions    .```"
+        return "```Position (FILE, RANK) is out of bounds! a <= FILE <= max(a, min(z, MAX_FILE)), where MAX_FILE is the largest lexicographical letter for the board's dimension.```"
       # Check if file and rank locally in bounds (within board dimensions)
       dim_str = str(board.NUM_ROWS)
       if board.NUM_ROWS < 10:
@@ -75,7 +75,7 @@ def ttt_handler():
         dim_sec_dig = dim_str[1]
         move_bounds_match = re.match("^move [a-" + board.MAX_FILE + "] [1-" + dim_first_dig + ']' + "[0-" + dim_sec_dig + "]$", command_input)
       if not move_bounds_match:
-        return "```Position (FILE, RANK) is out of bounds! a <= FILE <= max(a, min(z, MAX_FILE)), where MAX_FILE is the largest lexicographical letter for the board's dimensions    .```"
+        return "```Position (FILE, RANK) is out of bounds! a <= FILE <= max(a, min(z, MAX_FILE)), where MAX_FILE is the largest lexicographical letter for the board's dimension.```"
       this_game.make_move(fil_str, rnk, turn)
       return board.__str__()
     elif help_match:
