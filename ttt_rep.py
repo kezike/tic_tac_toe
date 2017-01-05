@@ -136,7 +136,7 @@ class TTT_Board:
     for j in xrange(self.NUM_COLS):
       self.row_delim += "---"
       if j != self.NUM_COLS - 1:
-        self.row_delim += "+"
+        self.row_delim += '+'
     self.row_delim += '|'
 
     # Cache printed board
