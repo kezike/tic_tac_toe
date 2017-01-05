@@ -79,7 +79,7 @@ class TTT_Board:
   def __init__(self):
     self.NUM_ROWS = 3
     self.NUM_COLS = 3
-    
+    self.MAX_FILE = 'c'
     # Turn represented as boolean,
     # where True = x and False = o
     self.rep_to_turn = {True: 'x', False: 'o'}
@@ -142,7 +142,7 @@ class TTT_Board:
 
     # Cache printed board
     # Ticks, underscores, and asterisks are for Slack formatting
-    self.printed_board = "```Play Tic Tac Toe!\n_Turn_: *x*\n"
+    self.printed_board = "```Welcome To Tic Tac Toe!\n_Turn_: *x*\n"
     for i in xrange(self.NUM_ROWS):
       rank_str = str(self.NUM_ROWS - i)
       self.printed_board += rank_str
@@ -161,6 +161,12 @@ class TTT_Board:
     self.printed_board += file_string
     self.printed_board += "```"
     self.state_changed = False
+  
+  # Configure square dimension of board
+  def set_dim(self, dim):
+    self.NUM_ROWS = dim
+    self.NUM_COLS = dim
+    self.MAX_FILE = self.rep_to_fil[dim - 1]
 
   # Converts file to cell index
   # (max file is 26 for alphabet)
@@ -201,7 +207,7 @@ class TTT_Board:
   def __str__(self):
     if not self.state_changed:
       return self.printed_board
-    self.printed_board = "```Play Tic Tac Toe!\n_Turn_: *" + self.rep_to_turn[self.turn_rep] + "*\n"
+    self.printed_board = "```Tic Tac Toe!\n_Turn_: *" + self.rep_to_turn[self.turn_rep] + "*\n"
     for i in xrange(self.NUM_ROWS):
       rank_str = str(self.NUM_ROWS - i)
       self.printed_board += rank_str

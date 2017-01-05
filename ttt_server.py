@@ -29,22 +29,28 @@ def ttt_handler():
   # TODO
   # Display board to user
   if command == "/ttt":
-    start_match = re.match("^start$", command_input)
+    start_match = re.match("^start", command_input)
+    start_match_flex = re.match("^start [1-26]$", command_input)
     display_match = re.match("^display$", command_input)
-    move_match = re.match("^move [a-c] [1-3]$", command_input)
+    move_match = re.match("^move [a-z] [1-26]$", command_input)
     help_match = re.match("^help$", command_input)
     if start_match:
       # TODO - Check if game already exists for channel
       # If not, set caller's piece to 'x',
       # set opponent's piece to 'o', and display board
+      if start_match_flex:
+        (start_cmd, dim) = command_input.split(' ')
+        board.set_dim(dim)
       return board.__str__()
     elif display_match:
       return board.__str__()
+    # This definition was placed here because we cannot access board.MAX_FILE until after "start" call
+    move_match = re.match("^move [a-" + board.MAX_FILE + "] [1-" + str(board.NUM_ROWS) + "]$", command_input)
     # Make move
     elif move_match:
       # verify proper input
       print "COMMAND INPUT:", command_input
-      (cmd_inp_name, fil_str, rnk_str) = command_input.split(' ')
+      (move_cmd, fil_str, rnk_str) = command_input.split(' ')
       rnk = int(rnk_str)
       print "fil:", fil_str
       print "rnk:", rnk
