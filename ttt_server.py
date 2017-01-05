@@ -26,8 +26,8 @@ def ttt_handler():
       "text": "Your app is not entitled to access the '/ttt' bot! :P"
     })
   board = this_game.board
-  turn_rep = board.turn_rep
-  turn = board.rep_to_turn(turn_rep)
+  turn_rep = this_game.turn_rep
+  turn = this_game.rep_to_piece(turn_rep)
   # Confirm user's turn
   # TODO
   # Display board to user

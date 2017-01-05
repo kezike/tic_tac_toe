@@ -5,12 +5,16 @@ class TTT_Game:
     # Must initialize board with dimensions indicated
     # in game play or 3 x 3 if not indicated
     self.board = None
-    self.turn = True
+    rep_to_pce = {True:'x', False:'o'}
+    self.turn_rep = True
+  
+  def rep_to_piece(self, piece_rep):
+    return self.rep_to_pce[piece_rep]
 
   def make_move(self, fil, rnk, val):
     self.board.insert(fil, rnk, val)
     # Now opponent's turn
-    self.turn = not self.turn
+    self.turn_rep = not self.turn_rep
 
   def is_over(self):
     board_rows = self.board.rows

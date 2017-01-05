@@ -81,7 +81,7 @@ class TTT_Board:
     self.NUM_COLS = dim
     # Turn represented as boolean,
     # where True = x and False = o
-    self.rep_to_piece = {True: 'x', False: 'o'}
+    self.rep_to_pce = {True: 'x', False: 'o'}
     self.turn_rep = True
 
     # Stores tic tac toe moves thus far
@@ -165,8 +165,8 @@ class TTT_Board:
     self.MAX_FILE = self.rep_to_fil[self.NUM_ROWS - 1]
 
   # Converts boolean to turn piece
-  def rep_to_turn(turn_rep):
-    return rep_to_piece(turn_rep)
+  def rep_to_piece(self, piece_rep):
+    return rep_to_pce(piece_rep)
 
   # Converts file to cell index
   # (max file is 26 for alphabet)
