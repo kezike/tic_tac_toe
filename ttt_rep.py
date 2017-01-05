@@ -166,7 +166,7 @@ class TTT_Board:
   def set_dim(self, dim):
     self.NUM_ROWS = dim
     self.NUM_COLS = dim
-    self.MAX_FILE = self.rep_to_fil[dim - 1]
+    self.MAX_FILE = self.rep_to_fil[int(dim) - 1]
 
   # Converts file to cell index
   # (max file is 26 for alphabet)
