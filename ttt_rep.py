@@ -166,7 +166,7 @@ class TTT_Board:
 
   # Converts boolean to turn piece
   def rep_to_piece(self, piece_rep):
-    return rep_to_pce(piece_rep)
+    return self.rep_to_pce(piece_rep)
 
   # Converts file to cell index
   # (max file is 26 for alphabet)
