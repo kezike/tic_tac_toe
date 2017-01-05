@@ -40,7 +40,13 @@ def ttt_handler():
       # set opponent's piece to 'o', and display board
       if start_match_flex:
         (start_cmd, dim) = command_input.split(' ')
-        board.set_dim(dim)
+        this_game.board = TTT_Board(dim)
+        board = this_game.board
+        # Mainly for setting board.MAX_FILE
+        board.set_MAX_FILE(dim)
+      else:
+        # Default to 3 x 3 dimension
+        this_game.board = TTT_Board(3)
       return board.__str__()
     elif display_match:
       return board.__str__()

@@ -76,10 +76,9 @@ Tic Tac Toe
     a   b   c 
 """
 class TTT_Board:
-  def __init__(self):
-    self.NUM_ROWS = 3
-    self.NUM_COLS = 3
-    self.MAX_FILE = 'c'
+  def __init__(self, dim=3):
+    self.NUM_ROWS = dim
+    self.NUM_COLS = dim
     # Turn represented as boolean,
     # where True = x and False = o
     self.rep_to_turn = {True: 'x', False: 'o'}
@@ -123,7 +122,7 @@ class TTT_Board:
     # (max file is 26 for alphabet)
     file_iter = 0
     self.fil_to_rep = {}
-    while file_iter < self.NUM_COLS and file_iter < NUM_LETTERS:
+    while file_iter < NUM_LETTERS:
       self.fil_to_rep[ALPHA[file_iter]] = file_iter
       file_iter += 1
 
@@ -162,11 +161,8 @@ class TTT_Board:
     self.printed_board += "```"
     self.state_changed = False
   
-  # Configure square dimension of board
-  def set_dim(self, dim):
-    self.NUM_ROWS = dim
-    self.NUM_COLS = dim
-    self.MAX_FILE = self.rep_to_fil[int(dim) - 1]
+    # Configure square dimension of board
+    self.MAX_FILE = self.rep_to_fil[self.NUM_ROWS - 1]
 
   # Converts file to cell index
   # (max file is 26 for alphabet)

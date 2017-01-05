@@ -2,7 +2,9 @@ import ttt_rep
 
 class TTT_Game:
   def __init__(self):
-    self.board = ttt_rep.TTT_Board()
+    # Must initialize board with dimensions indicated
+    # in game play or 3 x 3 if not indicated
+    self.board = None
     self.turn = True
 
   def make_move(self, fil, rnk, val):
