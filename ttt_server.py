@@ -43,7 +43,7 @@ def basic_handler():
     # Make move
     elif move_match:
       # verify proper input
-      (fil, rnk) = cmd_input.split(' ')
+      (fil, rnk) = command_input.split(' ')
       # Check if this valid file and rank
       # TODO
       if (0 <= board.file_to_rep(fil) < board.NUM_COLS) and (0 <= board.rank_to_rep(rnk) < board.NUM_ROWS):
