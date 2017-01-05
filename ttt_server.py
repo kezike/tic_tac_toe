@@ -47,7 +47,7 @@ def ttt_handler():
       (cmd_inp_name, fil_str, rnk_str) = command_input.split(' ')
       rnk = int(rnk_str)
       print "fil:", fil_str
-      print "rnk:", rnk_str
+      print "rnk:", rnk
       # Check if this valid file and rank
       # TODO
       if (0 <= board.file_to_rep(fil_str) < board.NUM_COLS) and (0 <= board.rank_to_rep(rnk) < board.NUM_ROWS):

@@ -28,10 +28,3 @@ class TTT_Game:
   def play(self):
     # TODO - accept input from users and invalidate input
     pass
-''''
-this_game = TTT_Game()
-print this_game.board
-if __name__ == "__main__":
-  while not this_game.is_over():
-    this_game.play()
-'''
