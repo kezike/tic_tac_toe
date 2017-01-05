@@ -34,7 +34,7 @@ def ttt_handler():
   if command == "/ttt":
     start_match = re.match("^start", command_input)
     display_match = re.match("^display$", command_input)
-    move_match = re.match("^move [a-z] ([1-9] | [1-2][0-6])$", command_input)
+    move_match = re.match("^move [a-z] ([1-9]|[1-2][0-6])$", command_input)
     help_match = re.match("^help$", command_input)
     if start_match:
       # TODO - Check if game already exists for channel
@@ -42,7 +42,7 @@ def ttt_handler():
       # set opponent's piece to 'o', and display board
       
       # Configure dimensions of board
-      start_match_flex = re.match("^start ([1-9] | [1-2][0-6])$", command_input)
+      start_match_flex = re.match("^start ([1-9]|[1-2][0-6])$", command_input)
       if start_match_flex:
         (start_cmd, dim) = command_input.split(' ')
         this_game.board = ttt_rep.TTT_Board(int(dim))
@@ -54,7 +54,7 @@ def ttt_handler():
       return board.__str__()
     elif display_match:
       if board == None:
-        return "```Cannot display board before starting game. Type '/ttt start DIM' to play new game.```\n" + board.__str__()
+        return "```Cannot display board before starting game. Type '/ttt start DIM' - where 1 <= DIM <= 26 - to play new game.```\n" + board.__str__()
       return board.__str__()
     # This definition was placed here because we cannot access board.MAX_FILE until after "start" call
     dim_str = str(board.NUM_ROWS)
