@@ -47,7 +47,7 @@ def ttt_handler():
     # This definition was placed here because we cannot access board.MAX_FILE until after "start" call
     move_match = re.match("^move [a-" + board.MAX_FILE + "] [1-" + str(board.NUM_ROWS) + "]$", command_input)
     # Make move
-    elif move_match:
+    if move_match:
       # verify proper input
       print "COMMAND INPUT:", command_input
       (move_cmd, fil_str, rnk_str) = command_input.split(' ')
