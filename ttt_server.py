@@ -43,6 +43,7 @@ def basic_handler():
     # Make move
     elif move_match:
       # verify proper input
+      print "COMMAND INPUT:", command_input
       (fil, rnk) = command_input.split(' ')
       # Check if this valid file and rank
       # TODO
