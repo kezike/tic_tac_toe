@@ -38,6 +38,8 @@ def ttt_handler():
       # TODO - Check if game already exists for channel
       # If not, set caller's piece to 'x',
       # set opponent's piece to 'o', and display board
+      
+      # Configure dimensions of board
       start_match_flex = re.match("^start [1-26]$", command_input)
       if start_match_flex:
         (start_cmd, dim) = command_input.split(' ')
@@ -46,6 +48,7 @@ def ttt_handler():
       else:
         # Default to 3 x 3 dimension
         this_game.board = ttt_rep.TTT_Board(3)
+        board = this_game.board
       return board.__str__()
     elif display_match:
       if board == None:
