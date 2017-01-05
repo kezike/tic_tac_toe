@@ -23,9 +23,11 @@ def ttt_handler():
     abort(400)
     return jsonify({
       "response_type": "ephemeral",
-      "text": "Sorry, that didn't work. Please try again."
+      "text": "Your app is not entitled to access the '/ttt' bot! :P"
     })
   board = this_game.board
+  turn_rep = board.turn_rep
+  turn = board.rep_to_turn(turn_rep)
   # Confirm user's turn
   # TODO
   # Display board to user
@@ -55,10 +57,10 @@ def ttt_handler():
         return "```Cannot display board before starting game. Type '/ttt start DIM' to play new game.```\n" + board.__str__()
       return board.__str__()
     # This definition was placed here because we cannot access board.MAX_FILE until after "start" call
+    dim_str = str(board.NUM_ROWS)
     if board.NUM_ROWS < 10:
-      move_match = re.match("^move [a-" + board.MAX_FILE + "] [1-" + str(board.NUM_ROWS) + "]$", command_input)
+      move_match = re.match("^move [a-" + board.MAX_FILE + "] [1-" + dim_str + "]$", command_input)
     else:
-      dim_str = str(board.NUM_ROWS)
       dim_first_dig = dim_str[0]
       dim_sec_dig = dim_str[1]
       move_match = re.match("^move [a-" + board.MAX_FILE + "] [1-" + dim_first_dig + ']' + "[0-" + dim_sec_dig + "]$", command_input)
@@ -73,7 +75,7 @@ def ttt_handler():
       print "rnk:", rnk
       # Check if this valid file and rank
       if (0 <= board.file_to_rep(fil_str) < board.NUM_COLS) and (0 <= board.rank_to_rep(rnk) < board.NUM_ROWS):
-        this_game.make_move(fil_str, rnk, 'x')
+        this_game.make_move(fil_str, rnk, turn)
         return board.__str__()
       else:
         return "```Position (FILE, RANK) is out of bounds! Try again.```\n" + board.__str__()
