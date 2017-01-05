@@ -54,36 +54,35 @@ def ttt_handler():
       return board.__str__()
     elif display_match:
       if board == None:
-        return "```Cannot display board before starting game. Type '/ttt start DIM' - where 1 <= DIM <= 26 - to play new game.```\n" + board.__str__()
+        return "```Cannot display board before starting game. Type '/ttt start [DIM]' (where 1 <= DIM <= 26) to play new game.```"
       return board.__str__()
-    # This definition was placed here because we cannot access board.MAX_FILE until after "start" call
-    dim_str = str(board.NUM_ROWS)
-    if board.NUM_ROWS < 10:
-      move_match = re.match("^move [a-" + board.MAX_FILE + "] [1-" + dim_str + "]$", command_input)
-    else:
-      dim_first_dig = dim_str[0]
-      dim_sec_dig = dim_str[1]
-      move_match = re.match("^move [a-" + board.MAX_FILE + "] [1-" + dim_first_dig + ']' + "[0-" + dim_sec_dig + "]$", command_input)
     # Make move
-    if move_match:
+    elif move_match:
       if board == None:
-        return "```Cannot make move before starting game. Type '/ttt start DIM' to play new game.```\n" + board.__str__()
-
+        return "```Cannot make move before starting game. Type '/ttt start [DIM]' (where 1 <= DIM <= 26) to play new game.```"
       (move_cmd, fil_str, rnk_str) = command_input.split(' ')
       rnk = int(rnk_str)
-      print "fil:", fil_str
-      print "rnk:", rnk
-      # Check if this valid file and rank
-      if (0 <= board.file_to_rep(fil_str) < board.NUM_COLS) and (0 <= board.rank_to_rep(rnk) < board.NUM_ROWS):
-        this_game.make_move(fil_str, rnk, turn)
-        return board.__str__()
+      # Check if file and rank globally in bounds (within a-z and 1-26)
+      move_bounds_match = re.match("^move [a-z] ([1-9]|[1-2][0-6])$", command_input)
+      if not move_bounds_match:
+        return "```Position (FILE, RANK) is out of bounds! a <= FILE <= max(a, min(z, MAX_FILE)), where MAX_FILE is the largest lexicographical letter for the board's dimensions    .```"
+      # Check if file and rank locally in bounds (within board dimensions)
+      dim_str = str(board.NUM_ROWS)
+      if board.NUM_ROWS < 10:
+        move_bounds_match = re.match("^move [a-" + board.MAX_FILE + "] [1-" + dim_str + "]$", command_input)
       else:
-        return "```Position (FILE, RANK) is out of bounds! Try again.```\n" + board.__str__()
+        dim_first_dig = dim_str[0]
+        dim_sec_dig = dim_str[1]
+        move_bounds_match = re.match("^move [a-" + board.MAX_FILE + "] [1-" + dim_first_dig + ']' + "[0-" + dim_sec_dig + "]$", command_input)
+      if not move_bounds_match:
+        return "```Position (FILE, RANK) is out of bounds! a <= FILE <= max(a, min(z, MAX_FILE)), where MAX_FILE is the largest lexicographical letter for the board's dimensions    .```"
+      this_game.make_move(fil_str, rnk, turn)
+      return board.__str__()
     elif help_match:
       manual = open("ttt_manual.txt", 'r')
       return manual.read()
     else:
-      return "```Illegal command! Type '/ttt help' for legal commands.```\n" + board.__str__()
+      return "```Illegal command format! Type '/ttt help' for legal command formatting.```"
   return "OK"
 
 if __name__ == "__main__":

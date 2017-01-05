@@ -1,5 +1,7 @@
+```
 Tic Tac Toe Manual
-/ttt start [DIM] - Initialize game of tic tac toe. Initializer is 'x' piece. Only one game is allowed in a channel at a time. If DIM is set, initialize game with board dimensions of DIM x DIM. Otherwise, DIM defaults to 3.
+/ttt start [DIM] - Initialize game of tic tac toe. Initializer is 'x' piece. Only one game is allowed in a channel at a time. If DIM is set, initialize game with board dimensions of DIM x DIM (1 <= DIM <= 26). Otherwise, DIM defaults to 3.
 /ttt display - Display game board.
 /ttt move FILE RANK - Place piece at position (FILE, RANK)
 /ttt help - Display this manual page.
+```
