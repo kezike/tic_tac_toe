@@ -48,29 +48,31 @@ def ttt_handler():
         this_game.board = ttt_rep.TTT_Board(3)
       return board.__str__()
     elif display_match:
+      if board == None:
+        return "```Cannot display board before starting game. Type '/ttt start DIM' to play new game.```\n" + board.__str__()
       return board.__str__()
     # This definition was placed here because we cannot access board.MAX_FILE until after "start" call
     move_match = re.match("^move [a-" + board.MAX_FILE + "] [1-" + str(board.NUM_ROWS) + "]$", command_input)
     # Make move
     if move_match:
-      # verify proper input
-      print "COMMAND INPUT:", command_input
+      if board == None:
+        return "```Cannot make move before starting game. Type '/ttt start DIM' to play new game.```\n" + board.__str__()
+
       (move_cmd, fil_str, rnk_str) = command_input.split(' ')
       rnk = int(rnk_str)
       print "fil:", fil_str
       print "rnk:", rnk
       # Check if this valid file and rank
-      # TODO
       if (0 <= board.file_to_rep(fil_str) < board.NUM_COLS) and (0 <= board.rank_to_rep(rnk) < board.NUM_ROWS):
         this_game.make_move(fil_str, rnk, 'x')
         return board.__str__()
       else:
-        return "Position (FILE, RANK) is out of bounds! Try again."
+        return "```Position (FILE, RANK) is out of bounds! Try again.```\n" + board.__str__()
     elif help_match:
       manual = open("ttt_manual.txt", 'r')
       return manual.read()
     else:
-      return "Illegal command! Type '/ttt help' for legal commands."
+      return "```Illegal command! Type '/ttt help' for legal commands.```\n" + board.__str__()
   return "OK"
 
 if __name__ == "__main__":
