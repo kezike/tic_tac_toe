@@ -6,7 +6,7 @@ class TTT_Game:
     self.turn = True
 
   def make_move(self, fil, rnk, val):
-    board.insert(fil, rnk, val)
+    self.board.insert(fil, rnk, val)
     # Now opponent's turn
     self.turn = not self.turn
 
