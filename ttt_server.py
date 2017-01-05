@@ -31,7 +31,6 @@ def ttt_handler():
   # Display board to user
   if command == "/ttt":
     start_match = re.match("^start", command_input)
-    start_match_flex = re.match("^start [1-26]$", command_input)
     display_match = re.match("^display$", command_input)
     move_match = re.match("^move [a-z] [1-26]$", command_input)
     help_match = re.match("^help$", command_input)
@@ -39,12 +38,11 @@ def ttt_handler():
       # TODO - Check if game already exists for channel
       # If not, set caller's piece to 'x',
       # set opponent's piece to 'o', and display board
+      start_match_flex = re.match("^start [1-26]$", command_input)
       if start_match_flex:
         (start_cmd, dim) = command_input.split(' ')
         this_game.board = ttt_rep.TTT_Board(int(dim))
         board = this_game.board
-        # Mainly for setting board.MAX_FILE
-        board.set_MAX_FILE(int(dim))
       else:
         # Default to 3 x 3 dimension
         this_game.board = ttt_rep.TTT_Board(3)
