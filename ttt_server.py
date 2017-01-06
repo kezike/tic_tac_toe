@@ -42,11 +42,11 @@ def ttt_handler():
       # set opponent's piece to 'O', and display board
       
       # Regex for invoking default-size board (3 x 3)
-      start_and_restart_match = re.match("^(re)?start$ @[a-z0-9][a-z0-9._-]*$", command_input)
+      start_and_restart_match = re.match("^(re)?start @[a-z0-9][a-z0-9._-]*$", command_input)
       # Regex for invoking configurable-size board
       start_and_restart_flex_match = re.match("^(re)?start ([1-9]|[1-2][0-6]) @[a-z0-9][a-z0-9._-]*$", command_input)
       if start_and_restart_match:
-        exact_start_match = re.match("^start$ @[a-z0-9][a-z0-9._-]*$", command_input)
+        exact_start_match = re.match("^start @[a-z0-9][a-z0-9._-]*$", command_input)
         if exact_start_match:
           # Check if game is already in progress
           # TODO - Check this from db
