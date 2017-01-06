@@ -14,6 +14,7 @@ this_game = ttt_game.TTT_Game()
 
 # Specifies response to start/restart command
 def start_handler(command_input): 
+  start_response = ""
   # Regex for invoking default-size board (3 x 3)
   start_and_restart_match = re.match("^(re)?start @[a-z0-9][a-z0-9._-]*$", command_input)
   # Regex for invoking configurable-size board
@@ -28,7 +29,7 @@ def start_handler(command_input):
     else:
       # End current game and start new game
       # TODO - Update db with flushed board and features and setup new board and features
-      ttt_response = "```Ending current game and starting new game...```\n"
+      start_response = "```Ending current game and starting new game...```\n"
     # Default to 3 x 3 dimension
     this_game.board = ttt_rep.TTT_Board(3)
     board = this_game.board
@@ -42,7 +43,7 @@ def start_handler(command_input):
     else:
       # End current game and start new game
       # TODO - Update db with flushed board and features and setup new board and features
-      ttt_response = "```Ending current game and starting new game with desired configuration...```\n"
+      start_response = "```Ending current game and starting new game with desired configuration...```\n"
     # Use desired board configuration
     (start_and_restart_cmd, dim, uname_handle) = command_input.split(' ')
     this_game.board = ttt_rep.TTT_Board(int(dim))
@@ -50,8 +51,8 @@ def start_handler(command_input):
   else:
     # Command contains "start", but is not of a legal format
     return "```Illegal command format! Type '/ttt help' for legal command formatting.```"
-  ttt_response += board.__str__()
-  return ttt_response
+  start_response += board.__str__()
+  return start_response
 
 # Specifies response to move command
 def move_handler(command_input): 
@@ -93,7 +94,6 @@ def ttt_handler():
   turn_rep = this_game.turn_rep
   # Confirm from user info in request payload
   turn = this_game.rep_to_piece(turn_rep)
-  ttt_response = ""
   if command == "/ttt":
     start_match = re.search("start", command_input)
     display_match = re.match("^display$", command_input) 
