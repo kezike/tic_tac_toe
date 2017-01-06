@@ -13,18 +13,19 @@ VERIFICATION_TOKEN="OTibeqhO18dvugBdlI3eCNHx"
 this_game = ttt_game.TTT_Game()
 
 # Specifies response to start/restart command
-def start_handler(command_input): 
+def start_handler(cmd_input): 
   start_response = ""
+  board = this_game.board 
   # Regex for invoking default-size board (3 x 3)
-  start_and_restart_match = re.match("^(re)?start @[a-z0-9][a-z0-9._-]*$", command_input)
+  start_and_restart_match = re.match("^(re)?start @[a-z0-9][a-z0-9._-]*$", cmd_input)
   # Regex for invoking configurable-size board
-  start_and_restart_flex_match = re.match("^(re)?start ([1-9]|[1-2][0-6]) @[a-z0-9][a-z0-9._-]*$", command_input)
+  start_and_restart_flex_match = re.match("^(re)?start ([1-9]|[1-2][0-6]) @[a-z0-9][a-z0-9._-]*$", cmd_input)
   if start_and_restart_match:
-    exact_start_match = re.match("^start @[a-z0-9][a-z0-9._-]*$", command_input)
+    exact_start_match = re.match("^start @[a-z0-9][a-z0-9._-]*$", cmd_input)
     if exact_start_match:
       # Check if game is already in progress
       # TODO - Check this from db
-      if this_game.board != None:
+      if board != None:
         return "```Game already in progress! Type '/ttt restart' to start a new game.```"
     else:
       # End current game and start new game
@@ -34,18 +35,18 @@ def start_handler(command_input):
     this_game.board = ttt_rep.TTT_Board(3)
     board = this_game.board
   elif start_and_restart_flex_match:
-    exact_start_flex_match = re.match("^start ([1-9]|[1-2][0-6])$", command_input)
+    exact_start_flex_match = re.match("^start ([1-9]|[1-2][0-6])$", cmd_input)
     if exact_start_flex_match:
       # Check if game is already in progress
       # TODO - Check this from db
-      if this_game.board != None:
+      if board != None:
         return "```Game already in progress! Type '/ttt restart' to start a new game.```"
     else:
       # End current game and start new game
       # TODO - Update db with flushed board and features and setup new board and features
       start_response = "```Ending current game and starting new game with desired configuration...```\n"
     # Use desired board configuration
-    (start_and_restart_cmd, dim, uname_handle) = command_input.split(' ')
+    (start_and_restart_cmd, dim, uname_handle) = cmd_input.split(' ')
     this_game.board = ttt_rep.TTT_Board(int(dim))
     board = this_game.board
   else:
@@ -55,23 +56,24 @@ def start_handler(command_input):
   return start_response
 
 # Specifies response to move command
-def move_handler(command_input): 
-  (move_cmd, fil_rnk_str) = command_input.split(' ')
+def move_handler(cmd_input): 
+  board = this_game.board
+  (move_cmd, fil_rnk_str) = cmd_input.split(' ')
   fil_str = fil_rnk_str[0]
   rnk_str = fil_rnk_str[1:]
   rnk = int(rnk_str)
   # Check if file and rank globally in bounds (within a-z and 1-26)
-  move_bounds_match = re.match("^move [a-z]([1-9]|[1-2][0-6])$", command_input)
+  move_bounds_match = re.match("^move [a-z]([1-9]|[1-2][0-6])$", cmd_input)
   if not move_bounds_match:
     return "```Position (FILE, RANK) is out of bounds! a <= FILE <= max(a, min(z, MAX_FILE)), where MAX_FILE is the largest lexicographical letter for the board's dimension.```"
   # Check if file and rank locally in bounds (within board dimensions)
   dim_str = str(board.NUM_ROWS)
   if board.NUM_ROWS < 10:
-    move_bounds_match = re.match("^move [a-" + board.MAX_FILE + "][1-" + dim_str + "]$", command_input)
+    move_bounds_match = re.match("^move [a-" + board.MAX_FILE + "][1-" + dim_str + "]$", cmd_input)
   else:
     dim_first_dig = dim_str[0]
     dim_sec_dig = dim_str[1]
-    move_bounds_match = re.match("^move [a-" + board.MAX_FILE + "][1-" + dim_first_dig + ']' + "[0-" + dim_sec_dig + "]$", command_input)
+    move_bounds_match = re.match("^move [a-" + board.MAX_FILE + "][1-" + dim_first_dig + ']' + "[0-" + dim_sec_dig + "]$", cmd_input)
   if not move_bounds_match:
     return "```Position (FILE, RANK) is out of bounds! a <= FILE <= max(a, min(z, MAX_FILE)), where MAX_FILE is the largest lexicographical letter for the board's dimension.```"
   this_game.make_move(fil_str, rnk, turn)
@@ -122,6 +124,7 @@ def ttt_handler():
         return "```Cannot end game before starting game. Type '/ttt start [DIM]' (where 1 <= DIM <= 26) to play a new game.```"
       # TODO - Update db with flushed board and features
       return "```Game Ended! Thanks for playing Tic Tac Toe :}```"
+    # Display manual
     elif help_match:
       manual = open("ttt_manual.txt", 'r')
       return manual.read()
