@@ -31,7 +31,7 @@ def ttt_handler():
   turn = this_game.rep_to_piece(turn_rep)
   ttt_response = ""
   if command == "/ttt":
-    start_match = re.match("start", command_input)
+    start_match = re.search("start", command_input)
     display_match = re.match("^display$", command_input)
     move_match = re.match("^move [a-z]\d+$", command_input)
     end_match = re.match("^end$", command_input)

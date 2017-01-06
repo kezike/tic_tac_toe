@@ -7,7 +7,7 @@ Commands
 /ttt start [DIM] - Initialize game of tic tac toe. Initializer is 'x' player. Only one game is allowed in a channel at a time. If DIM is set, initialize game with board dimensions of DIM x DIM (1 <= DIM <= 26). Otherwise, DIM defaults to 3.
 /ttt display - Display game board.
 /ttt move [FILE][RANK] - Place piece at position (FILE, RANK).
-/ttt restart [DIM] - End current game ande start new game of tic tac toe. Initializer is 'x' player. Only one game is allowed in a channel at a time. If DIM is set, initialize game with board dimensions of DIM x DIM (1 <= DIM <= 26). Otherwise, DIM defaults to 3.
+/ttt restart [DIM] - End current game ande start new game of tic tac toe. Initializer is 'x' player. Only one game is allowed in a channel at a time. If DIM is set, initialize game with board dimensions of DIM x DIM (1 <= DIM <= 26). Otherwise, DIM defaults to 3. This command behaves identically to '/ttt start' if no game is in progress.
 /ttt end - End current game.
 /ttt help - Display this manual page.
 ```
