@@ -58,6 +58,9 @@ def start_handler(cmd_input):
 # Specifies response to move command
 def move_handler(cmd_input): 
   board = this_game.board
+  turn_rep = this_game.turn_rep
+  # Confirm from user info in request payload
+  turn = this_game.rep_to_piece(turn_rep)
   (move_cmd, fil_rnk_str) = cmd_input.split(' ')
   fil_str = fil_rnk_str[0]
   rnk_str = fil_rnk_str[1:]
