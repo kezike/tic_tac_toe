@@ -5,7 +5,7 @@ class TTT_Game:
     # Must initialize board with dimensions indicated
     # in game play or 3 x 3 if not indicated
     self.board = None
-    self.rep_to_pce = {True:'x', False:'o'}
+    self.rep_to_pce = {True:'X', False:'O'}
     self.turn_rep = True
   
   def rep_to_piece(self, piece_rep):

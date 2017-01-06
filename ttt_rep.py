@@ -18,7 +18,7 @@ class TTT_Cell:
 # Represents a section in a tic tac toe board
 class TTT_Section:
   def __init__(self):
-    # bit array representing 'x's (1), 'o's (0), and null (infinity)
+    # bit array representing 'X's (1), 'O's (0), and null (infinity)
     self.cells = []
     self.NUM_CELLS = INF
     self.num_insertions = 0
@@ -26,12 +26,12 @@ class TTT_Section:
     self.matches = True
 
   def insert(self, val):
-    if val == 'x':
+    if val == 'X':
       self.cells.append(1)
       self.num_insertions += 1
       self.matches = self.matches and (self.last_insertion == 1 or self.last_insertion == INF)
       self.last_insertion = 1
-    elif val == 'o':
+    elif val == 'O':
       self.cells.append(0)
       self.num_insertions += 1
       self.matches = self.matches and (self.last_insertion == 0 or self.last_insertion == INF)
@@ -80,7 +80,7 @@ class TTT_Board:
     self.NUM_ROWS = dim
     self.NUM_COLS = dim
     # Turn represented as boolean,
-    # where True = x and False = o
+    # where True = X and False = O
     self.rep_to_pce = {True: 'X', False: 'O'}
     self.turn_rep = True
 
@@ -141,7 +141,7 @@ class TTT_Board:
 
     # Cache printed board
     # Ticks, underscores, and asterisks are for Slack formatting
-    self.printed_board = "```Welcome To Tic Tac Toe!\nTurn: x\n"
+    self.printed_board = "```Welcome To Tic Tac Toe!\nTurn: X\n"
     for i in xrange(self.NUM_ROWS):
       rank_str = str(self.NUM_ROWS - i)
       self.printed_board += rank_str
@@ -208,7 +208,7 @@ class TTT_Board:
     if not self.state_changed:
       return self.printed_board
     self.printed_board = "```Tic Tac Toe\nTurn: " + self.rep_to_piece(self.turn_rep) + "\n"
-    for i in xrange(self.NUM_ROWS):
+    for i in Orange(self.NUM_ROWS):
       rank_str = str(self.NUM_ROWS - i)
       self.printed_board += rank_str
       if len(rank_str) == 1:

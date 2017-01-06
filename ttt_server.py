@@ -38,15 +38,15 @@ def ttt_handler():
     help_match = re.match("^help$", command_input)
     if start_match:
       # TODO - Check if game already exists for channel
-      # If not, set caller's piece to 'x',
+      # If not, set caller's piece to 'X',
       # set opponent's piece to 'o', and display board
       
       # Regex for invoking default-size board (3 x 3)
-      start_and_restart_match = re.match("^(re)?start$", command_input)
+      start_and_restart_match = re.match("^(re)?start$ @[a-z0-9][a-z0-9._-]*$", command_input)
       # Regex for invoking configurable-size board
-      start_and_restart_flex_match = re.match("^(re)?start ([1-9]|[1-2][0-6])$", command_input)
+      start_and_restart_flex_match = re.match("^(re)?start ([1-9]|[1-2][0-6]) @[a-z0-9][a-z0-9._-]*$", command_input)
       if start_and_restart_match:
-        exact_start_match = re.match("^start$", command_input)
+        exact_start_match = re.match("^start$ @[a-z0-9][a-z0-9._-]*$", command_input)
         if exact_start_match:
           # Check if game is already in progress
           # TODO - Check this from db

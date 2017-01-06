@@ -5,9 +5,10 @@ metadata = MetaData()
 
 games = Table('games', metadata,
              Column('id', Integer, primary_key=True), 
+             Column('channel_id', String),
              Column('board_id', String),
-             Column('player1_id', String),
-             Column('player2_id', String),
+             Column('player1_uname', String),
+             Column('player2_uname', String),
              Column('turn', Unicode),
              Column('is_over', Boolean)
 )
