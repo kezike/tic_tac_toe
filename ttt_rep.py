@@ -208,7 +208,7 @@ class TTT_Board:
     if not self.state_changed:
       return self.printed_board
     self.printed_board = "```Tic Tac Toe\nTurn: " + self.rep_to_piece(self.turn_rep) + "\n"
-    for i in Orange(self.NUM_ROWS):
+    for i in xrange(self.NUM_ROWS):
       rank_str = str(self.NUM_ROWS - i)
       self.printed_board += rank_str
       if len(rank_str) == 1:
