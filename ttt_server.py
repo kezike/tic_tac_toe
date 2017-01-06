@@ -52,9 +52,10 @@ def ttt_handler():
           # TODO - Check this from db
           if this_game.board != None:
             return "```Game already in progress! Type '/ttt restart' to start a new game.```"
-        else:
-          # TODO - Update db with flushed board and features and setup new board and features
-          ttt_response = "```Ending current game and starting new game...```"
+          else:
+            # End current game and start new game
+            # TODO - Update db with flushed board and features and setup new board and features
+            ttt_response = "```Ending current game and starting new game...```"
         # Default to 3 x 3 dimension
         this_game.board = ttt_rep.TTT_Board(3)
         board = this_game.board
@@ -65,10 +66,10 @@ def ttt_handler():
           # TODO - Check this from db
           if this_game.board != None:
             return "```Game already in progress! Type '/ttt restart' to start a new game.```"
-        else:
-          # TODO - Update db with flushed board and features and setup new board and features
-          ttt_response = "```Ending current game and starting new game with desired configuration...```"
-        # Use configurable board configuration
+          else:
+            # TODO - Update db with flushed board and features and setup new board and features
+            ttt_response = "```Ending current game and starting new game with desired configuration...```"
+        # Use desired board configuration
         (start_and_restart_cmd, dim) = command_input.split(' ')
         this_game.board = ttt_rep.TTT_Board(int(dim))
         board = this_game.board
@@ -104,7 +105,7 @@ def ttt_handler():
       return board.__str__()
     elif end_match:
       # TODO - Update db with flushed board and features
-      return "```Game Ended!```"
+      return "```Game Ended! Thanks for playing Tic Tac Toe :}```"
     elif help_match:
       manual = open("ttt_manual.txt", 'r')
       return manual.read()

@@ -1,5 +1,9 @@
 ```
 Tic Tac Toe Manual
+Rules
+Tic Tac Toe is a two-player game in which each player aims to align their piece ('x' or 'o') in a contiguous section - along a row or column - or along a diagonal on the game board. In traditional Tic tac Toe, this board has 3 x 3 dimension. However, in this version, players can configure the board dimension up to 26 x 26.
+
+Commands
 /ttt start [DIM] - Initialize game of tic tac toe. Initializer is 'x' player. Only one game is allowed in a channel at a time. If DIM is set, initialize game with board dimensions of DIM x DIM (1 <= DIM <= 26). Otherwise, DIM defaults to 3.
 /ttt display - Display game board.
 /ttt move [FILE][RANK] - Place piece at position (FILE, RANK).
