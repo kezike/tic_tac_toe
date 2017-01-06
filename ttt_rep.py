@@ -81,7 +81,7 @@ class TTT_Board:
     self.NUM_COLS = dim
     # Turn represented as boolean,
     # where True = x and False = o
-    self.rep_to_pce = {True: 'x', False: 'o'}
+    self.rep_to_pce = {True: 'X', False: 'O'}
     self.turn_rep = True
 
     # Stores tic tac toe moves thus far
