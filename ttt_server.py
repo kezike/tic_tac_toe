@@ -55,7 +55,7 @@ def ttt_handler():
         else:
           # End current game and start new game
           # TODO - Update db with flushed board and features and setup new board and features
-          ttt_response = "```Ending current game and starting new game...```"
+          ttt_response = "```Ending current game and starting new game...```\n"
         # Default to 3 x 3 dimension
         this_game.board = ttt_rep.TTT_Board(3)
         board = this_game.board
@@ -68,7 +68,7 @@ def ttt_handler():
             return "```Game already in progress! Type '/ttt restart' to start a new game.```"
         else:
           # TODO - Update db with flushed board and features and setup new board and features
-          ttt_response = "```Ending current game and starting new game with desired configuration...```"
+          ttt_response = "```Ending current game and starting new game with desired configuration...```\n"
         # Use desired board configuration
         (start_and_restart_cmd, dim) = command_input.split(' ')
         this_game.board = ttt_rep.TTT_Board(int(dim))
