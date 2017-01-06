@@ -39,7 +39,7 @@ def ttt_handler():
     if start_match:
       # TODO - Check if game already exists for channel
       # If not, set caller's piece to 'X',
-      # set opponent's piece to 'o', and display board
+      # set opponent's piece to 'O', and display board
       
       # Regex for invoking default-size board (3 x 3)
       start_and_restart_match = re.match("^(re)?start$ @[a-z0-9][a-z0-9._-]*$", command_input)
