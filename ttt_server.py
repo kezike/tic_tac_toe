@@ -30,8 +30,8 @@ def uname_to_uid(uname):
 # Convert Slack user id to username
 def uid_to_uname(uid):
   user_info_res = SLACK_CLIENT.api_call("users.info", user=uid)
-    if user_info_res["ok"]:
-      return user_info_res["name"]
+  if user_info_res["ok"]:
+    return user_info_res["name"]
   # Unable to authenticate
   return None
 
