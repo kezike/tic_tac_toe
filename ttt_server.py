@@ -29,8 +29,6 @@ def uname_to_uid(uname):
 
 # Convert Slack user id to username
 def uid_to_uname(uid):
-  print "UID:", uid
-  print "UID TYPE:", type(uid)
   user_info_res = SLACK_CLIENT.api_call("users.info", user=uid)
   if user_info_res["ok"]:
     return user_info_res["user"]["name"]
@@ -60,7 +58,7 @@ def start_handler(cmd_input, own_uid):
     (start_and_restart_cmd, uname_handle) = cmd_input.split(' ')
     opp_uname = uname_handle.split('@')[1]
     opp_uid = uname_to_uid(opp_uname)
-    start_response += "```@" + uid_to_uname(own_uid) + " (X) challenging @" + opp_uname + "(O)" + "to a game of Tic Tac Toe...```\n"
+    start_response += "```@" + uid_to_uname(own_uid) + " (X) is challenging @" + opp_uname + "(O)" + "to a game of Tic Tac Toe...```\n"
     this_game.board = ttt_rep.TTT_Board(3)
     board = this_game.board
   elif start_and_restart_flex_match:
@@ -78,7 +76,7 @@ def start_handler(cmd_input, own_uid):
     (start_and_restart_cmd, dim, uname_handle) = cmd_input.split(' ')
     opp_uname = uname_handle.split('@')[1]
     opp_uid = uname_to_uid(opp_uname)
-    start_response += "```@" + uid_to_uname(own_uid) + " (X) challenging @" + opp_uname + "(O)" + "to a game of Tic Tac Toe...```\n"
+    start_response += "```@" + uid_to_uname(own_uid) + " (X) is challenging @" + opp_uname + "(O)" + "to a game of Tic Tac Toe...```\n"
     this_game.board = ttt_rep.TTT_Board(int(dim))
     board = this_game.board
   else:
@@ -119,7 +117,7 @@ def ttt_handler():
   token = request.form.get('token', None)
   command = request.form.get('command', None)
   command_input = request.form.get('text', None)
-  user_id = request.form.get('usr_id', None)
+  user_id = request.form.get('user_id', None)
 
   # Validate parameters
   if not token or token != APP_TOKEN:
