@@ -206,7 +206,6 @@ class TTT_Board:
       self.diags[1].insert(val)
     self.get_cell(fil, rnk).insert(val)    
     self.turn_rep = not self.turn_rep
-    self.header = self.STEADY_STATE_HEADER
     self.state_changed = True
 
   def __str__(self):
