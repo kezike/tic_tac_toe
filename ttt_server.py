@@ -42,7 +42,6 @@ def start_handler(cmd_input, own_uid):
   # Confirm from user info in request payload
   turn = this_game.rep_to_piece(turn_rep)
   # TODO - Calculate TURN_USERNAME
-  board.header = board.INITIAL_HEADER + " (@TURN_USERNAME)\n"
   start_response = ""
   # Regex for invoking default-size board (3 x 3)
   start_and_restart_match = re.match("^(re)?start @[a-z0-9][a-z0-9._-]*$", cmd_input)
@@ -87,6 +86,7 @@ def start_handler(cmd_input, own_uid):
   else:
     # Command contains "start", but is not of a legal format
     return "```Illegal command format! Type '/ttt help' for legal command formatting.```"
+  board.header = board.INITIAL_HEADER + " (@TURN_USERNAME)\n"
   start_response += board.__str__()
   return start_response
 
