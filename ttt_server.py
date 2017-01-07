@@ -19,7 +19,7 @@ this_game = ttt_game.TTT_Game()
 def uname_to_uid(uname):
   user_list_res = slack_client.api_call("users.list")
   if user_list_res["ok"]:
-    members = users_list_res["members"]
+    members = user_list_res["members"]
     for member in members:
       if member["name"] == uname:
         return member["id"]
