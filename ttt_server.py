@@ -21,7 +21,7 @@ def uname_to_uid(uname):
   if user_list_res["ok"]:
     members = users_list_res["members"]
     for member in members:
-      if member["name"] = uname:
+      if member["name"] == uname:
         return member["id"]
     return "No such user!"
   return "Unable to authenticate!"
