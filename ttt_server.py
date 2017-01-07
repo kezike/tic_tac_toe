@@ -31,7 +31,7 @@ def uname_to_uid(uname):
 def uid_to_uname(uid):
   user_info_res = SLACK_CLIENT.api_call("users.info", user=uid)
   if user_info_res["ok"]:
-    return user_info_res["name"]
+    return user_info_res["user"]["name"]
   # Unable to authenticate
   return None
 
