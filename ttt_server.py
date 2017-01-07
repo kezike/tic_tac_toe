@@ -8,7 +8,8 @@ app = Flask(__name__)
 
 HOST = "/kayode-ezike-ttt.herokuapp.com"
 PORT = 5000
-VERIFICATION_TOKEN="OTibeqhO18dvugBdlI3eCNHx"
+APP_TOKEN = os.environ["APP_TOKEN"]
+OAUTH_TOKEN = os.environ["OAUTH_TOKEN"]
 
 this_game = ttt_game.TTT_Game()
 
@@ -32,6 +33,8 @@ def start_handler(cmd_input):
       # TODO - Update db with flushed board and features and setup new board and features
       start_response = "```Ending current game and starting new game...```\n"
     # Default to 3 x 3 dimension
+    (start_and_restart_cmd, uname_handle) = cmd_input.split(' ')
+    uname = uname_handle.split('@')[1]
     this_game.board = ttt_rep.TTT_Board(3)
     board = this_game.board
   elif start_and_restart_flex_match:
@@ -47,6 +50,7 @@ def start_handler(cmd_input):
       start_response = "```Ending current game and starting new game with desired configuration...```\n"
     # Use desired board configuration
     (start_and_restart_cmd, dim, uname_handle) = cmd_input.split(' ')
+    uname = uname_handle.split('@')[1]
     this_game.board = ttt_rep.TTT_Board(int(dim))
     board = this_game.board
   else:
@@ -89,7 +93,7 @@ def ttt_handler():
   command_input = request.form.get('text', None)
 
   # Validate parameters
-  if not token or token != VERIFICATION_TOKEN:
+  if not token or token != APP_TOKEN:
     abort(400)
     return jsonify({
       "response_type": "ephemeral",
