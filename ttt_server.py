@@ -11,23 +11,32 @@ HOST = "/kayode-ezike-ttt.herokuapp.com"
 PORT = 5000
 APP_TOKEN = os.environ["APP_TOKEN"]
 OAUTH_TOKEN = os.environ["OAUTH_TOKEN"]
-slack_client = SlackClient(OAUTH_TOKEN)
+SLACK_CLIENT = SlackClient(OAUTH_TOKEN)
 
 this_game = ttt_game.TTT_Game()
 
 # Convert Slack username to user id
 def uname_to_uid(uname):
-  user_list_res = slack_client.api_call("users.list")
+  user_list_res = SLACK_CLIENT.api_call("users.list")
   if user_list_res["ok"]:
     members = user_list_res["members"]
     for member in members:
       if member["name"] == uname:
         return member["id"]
     return "No such user!"
-  return "Unable to authenticate!"
+  # Unable to authenticate
+  return None
+
+# Convert Slack user id to username
+def uid_to_uname(uid):
+  user_info_res = SLACK_CLIENT.api_call("users.info", user=uid)
+    if user_info_res["ok"]:
+      return user_info_res["name"]
+  # Unable to authenticate
+  return None
 
 # Specifies response to start/restart command
-def start_handler(cmd_input): 
+def start_handler(cmd_input, own_uid): 
   start_response = ""
   board = this_game.board 
   # Regex for invoking default-size board (3 x 3)
@@ -47,9 +56,9 @@ def start_handler(cmd_input):
       start_response = "```Ending current game and starting new game...```\n"
     # Default to 3 x 3 dimension
     (start_and_restart_cmd, uname_handle) = cmd_input.split(' ')
-    uname = uname_handle.split('@')[1]
-    uid = uname_to_uid(uname)
-    start_response += "```Challenging " + uname + '(' + uid + ')' + "to game of Tic Tac Toe...```\n"
+    opp_uname = uname_handle.split('@')[1]
+    opp_uid = uname_to_uid(opp_uname)
+    start_response += "```@" + uid_to_uname(own_uid) + " (X) challenging @" + opp_uname + "(O)" + "to a game of Tic Tac Toe...```\n"
     this_game.board = ttt_rep.TTT_Board(3)
     board = this_game.board
   elif start_and_restart_flex_match:
@@ -65,9 +74,9 @@ def start_handler(cmd_input):
       start_response = "```Ending current game and starting new game with desired configuration...```\n"
     # Use desired board configuration
     (start_and_restart_cmd, dim, uname_handle) = cmd_input.split(' ')
-    uname = uname_handle.split('@')[1]
-    uid = uname_to_uid(uname)
-    start_response += "```Challenging " + uname + '(' + uid + ')' + "to game of Tic Tac Toe...```\n"
+    opp_uname = uname_handle.split('@')[1]
+    opp_uid = uname_to_uid(opp_uname)
+    start_response += "```@" + uid_to_uname(own_uid) + " (X) challenging @" + opp_uname + "(O)" + "to a game of Tic Tac Toe...```\n"
     this_game.board = ttt_rep.TTT_Board(int(dim))
     board = this_game.board
   else:
@@ -108,6 +117,7 @@ def ttt_handler():
   token = request.form.get('token', None)
   command = request.form.get('command', None)
   command_input = request.form.get('text', None)
+  user_id = request.form.get('usr_id', None)
 
   # Validate parameters
   if not token or token != APP_TOKEN:
@@ -131,7 +141,7 @@ def ttt_handler():
       # TODO - Check if game already exists for channel
       # If not, set caller's piece to 'X',
       # set opponent's piece to 'O', and display board
-      return start_handler(command_input)
+      return start_handler(command_input, user_id)
     # Display board
     elif display_match:
       if board == None:
