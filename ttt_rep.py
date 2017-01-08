@@ -83,11 +83,13 @@ class TTT_Board:
     # where True = X and False = O
     self.rep_to_pce = {True: 'X', False: 'O'}
     self.turn_rep = True
+    '''
     # Text above board
-    self.INITIAL_HEADER = "```Welcome To Tic Tac Toe!\nTurn: X"
-    self.STEADY_STATE_HEADER = "```Tic Tac Toe\nTurn:"
-    self.header = "```"
-
+    self.WELCOME_HEADER = "```Welcome To Tic Tac Toe!\nTurn: X"
+    self.MAIN_HEADER = "```Tic Tac Toe\nTurn:"
+    self.header = self.WELCOME_HEADER 
+    '''
+    
     # Stores tic tac toe moves thus far
     # (represented in row major form)
     self.cells = []
@@ -145,7 +147,7 @@ class TTT_Board:
 
     # Cache printed board
     # Ticks, underscores, and asterisks are for Slack formatting
-    self.printed_board = self.header
+    self.printed_board = ""
     for i in xrange(self.NUM_ROWS):
       rank_str = str(self.NUM_ROWS - i)
       self.printed_board += rank_str
@@ -211,7 +213,7 @@ class TTT_Board:
   def __str__(self):
     if not self.state_changed:
       return self.printed_board 
-    self.printed_board = self.header
+    self.printed_board = ""
     for i in xrange(self.NUM_ROWS):
       rank_str = str(self.NUM_ROWS - i)
       self.printed_board += rank_str
