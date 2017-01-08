@@ -57,7 +57,7 @@ def start_handler(cmd_input, own_uid):
     else:
       # End current game and start new game
       # TODO - Update db with flushed board and features and setup new board and features
-      start_response = "```Ending current game and starting new game...```\n"
+      start_response = "```Ending current game and starting new game...```\n" + start_response
     # Default to 3 x 3 dimension
     (start_and_restart_cmd, uname_handle) = cmd_input.split(' ')
     opp_uname = uname_handle.split('@')[1]
