@@ -86,7 +86,7 @@ class TTT_Board:
     # Text above board
     self.INITIAL_HEADER = "```Welcome To Tic Tac Toe!\nTurn: X"
     self.STEADY_STATE_HEADER = "```Tic Tac Toe\nTurn:"
-    self.header = ""
+    self.header = "```"
 
     # Stores tic tac toe moves thus far
     # (represented in row major form)
