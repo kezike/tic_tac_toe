@@ -92,11 +92,6 @@ def start_handler(cmd_input, own_uid):
 # Specifies response to move command
 def move_handler(cmd_input): 
   board = this_game.board
-  turn_rep = this_game.turn_rep
-  # Confirm from user info in request payload
-  turn = this_game.rep_to_piece(turn_rep)
-  # TODO - Calculate TURN_USERNAME
-  move_response = "```Turn: " + board.rep_to_piece(turn_rep) + " (@TURN_USERNAME)\n"
   (move_cmd, fil_rnk_str) = cmd_input.split(' ')
   fil_str = fil_rnk_str[0]
   rnk_str = fil_rnk_str[1:]
@@ -115,8 +110,13 @@ def move_handler(cmd_input):
     move_bounds_match = re.match("^move [a-" + board.MAX_FILE + "][1-" + dim_first_dig + ']' + "[0-" + dim_sec_dig + "]$", cmd_input)
   if not move_bounds_match:
     return "```Position (FILE, RANK) is out of bounds! a <= FILE <= max(a, min(z, MAX_FILE)), where MAX_FILE is the largest lexicographical letter for the board's dimension.```"
+  turn_rep = this_game.turn_rep
+  # Confirm from user info in request payload
+  turn = this_game.rep_to_piece(turn_rep)
   this_game.make_move(fil_str, rnk, turn)
-  move_response += board.__str__()
+  turn_rep = this_game.turn_rep
+  # TODO - Calculate TURN_USERNAME
+  move_response = "```Turn: " + board.rep_to_piece(turn_rep) + " (@TURN_USERNAME)\n" + board.__str__()
   return move_response
 
 @app.route('/', methods=['POST'])
