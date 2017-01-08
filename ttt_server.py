@@ -41,7 +41,8 @@ def start_handler(cmd_input, own_uid):
   turn_rep = this_game.turn_rep
   # Confirm from user info in request payload
   turn = this_game.rep_to_piece(turn_rep) 
-  start_response = "```Turn: X (@" + uid_to_uname(own_uid) + ")\n"
+  own_uname = uid_to_uname(own_uid)
+  start_response = "```Turn: X (@" + own_uname + ")\n"
   # Regex for invoking default-size board (3 x 3)
   start_and_restart_match = re.match("^(re)?start @[a-z0-9][a-z0-9._-]*$", cmd_input)
   # Regex for invoking configurable-size board
@@ -61,7 +62,7 @@ def start_handler(cmd_input, own_uid):
     (start_and_restart_cmd, uname_handle) = cmd_input.split(' ')
     opp_uname = uname_handle.split('@')[1]
     opp_uid = uname_to_uid(opp_uname)
-    start_response = "```@" + uid_to_uname(own_uid) + " (X) is challenging @" + opp_uname + " (O) " + "to a game of Tic Tac Toe...```\n" + start_response
+    start_response = "```@" + own_name + " (X) is challenging @" + opp_uname + " (O) " + "to a game of Tic Tac Toe...```\n" + start_response
     this_game.board = ttt_rep.TTT_Board(3)
     board = this_game.board
   elif start_and_restart_flex_match:
@@ -74,7 +75,7 @@ def start_handler(cmd_input, own_uid):
     else:
       # End current game and start new game
       # TODO - Update db with flushed board and features and setup new board and features
-      start_response = "```Ending current game and starting new game with desired configuration...```\n"
+      start_response = "```Ending current game and starting new game with desired configuration...```\n" + start_response
     # Use desired board configuration
     (start_and_restart_cmd, dim, uname_handle) = cmd_input.split(' ')
     opp_uname = uname_handle.split('@')[1]
