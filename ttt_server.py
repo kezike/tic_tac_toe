@@ -61,7 +61,7 @@ def start_handler(cmd_input, own_uid):
     (start_and_restart_cmd, uname_handle) = cmd_input.split(' ')
     opp_uname = uname_handle.split('@')[1]
     opp_uid = uname_to_uid(opp_uname)
-    start_response = "```@" + uid_to_uname(own_uid) + " (X) is challenging @" + opp_uname + " (O) " + "to a game of Tic Tac Toe...```\n" 
+    start_response = "```@" + uid_to_uname(own_uid) + " (X) is challenging @" + opp_uname + " (O) " + "to a game of Tic Tac Toe...```\n" + start_response
     this_game.board = ttt_rep.TTT_Board(3)
     board = this_game.board
   elif start_and_restart_flex_match:
@@ -79,7 +79,7 @@ def start_handler(cmd_input, own_uid):
     (start_and_restart_cmd, dim, uname_handle) = cmd_input.split(' ')
     opp_uname = uname_handle.split('@')[1]
     opp_uid = uname_to_uid(opp_uname)
-    start_response = "```@" + uid_to_uname(own_uid) + " (X) is challenging @" + opp_uname + " (O) " + "to a game of Tic Tac Toe...```\n"
+    start_response = "```@" + uid_to_uname(own_uid) + " (X) is challenging @" + opp_uname + " (O) " + "to a game of Tic Tac Toe...```\n" + start_response
     this_game.board = ttt_rep.TTT_Board(int(dim))
     board = this_game.board
   else:
@@ -96,7 +96,7 @@ def move_handler(cmd_input):
   # Confirm from user info in request payload
   turn = this_game.rep_to_piece(turn_rep)
   # TODO - Calculate TURN_USERNAME
-  board.header = "Turn: " + board.rep_to_piece(turn_rep) + " (@TURN_USERNAME)\n"
+  move_response = "```Turn: " + board.rep_to_piece(turn_rep) + " (@TURN_USERNAME)\n"
   (move_cmd, fil_rnk_str) = cmd_input.split(' ')
   fil_str = fil_rnk_str[0]
   rnk_str = fil_rnk_str[1:]
@@ -116,7 +116,8 @@ def move_handler(cmd_input):
   if not move_bounds_match:
     return "```Position (FILE, RANK) is out of bounds! a <= FILE <= max(a, min(z, MAX_FILE)), where MAX_FILE is the largest lexicographical letter for the board's dimension.```"
   this_game.make_move(fil_str, rnk, turn)
-  return board.__str__()
+  move_response += board.__str__()
+  return move_response
 
 @app.route('/', methods=['POST'])
 def ttt_handler():
