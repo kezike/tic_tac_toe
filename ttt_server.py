@@ -153,7 +153,9 @@ def ttt_handler():
     elif display_match:
       if board == None:
         return "```Cannot display board before starting game. Type '/ttt start [DIM]' (where 1 <= DIM <= 26) to play a new game.```"
-      return board.__str__()
+      # TODO - Calculate TURN_USERNAME
+      display_response = "```Turn: " + board.rep_to_piece(turn_rep) + " (@TURN_USERNAME)\n" + board.__str__()
+      return display_response
     # Make move
     elif move_match:
       if board == None:
