@@ -10,6 +10,7 @@ Flask-SQLAlchemy==2.1
 itsdangerous==0.24
 Jinja2==2.8
 MarkupSafe==0.23
+psycopg2==2.4.4
 pycosat==0.6.1
 pycrypto==2.6.1
 pyjade==4.0.0
