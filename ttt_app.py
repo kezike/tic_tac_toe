@@ -8,8 +8,8 @@ app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["DATABASE_URL"]
 db = SQLAlchemy(app)
 
-import ttt_rep
-this_game = ttt_rep.TTT_Game()
+# import ttt_rep
+this_game = None
 
 HOST = "/kayode-ezike-ttt.herokuapp.com"
 PORT = 5000
@@ -179,5 +179,7 @@ def ttt_handler():
   return "OK"
 
 if __name__ == "__main__":
+  import ttt_rep
+  this_game = ttt_rep.TTT_Game()
   port = int(os.environ.get("PORT", 5000))
   app.run(host='', port=port)
