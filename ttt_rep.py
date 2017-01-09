@@ -25,7 +25,7 @@ class TTT_Cell(db.Model):
     return '|', self.value, '|'
 
 # Represents a section in a tic tac toe board
-class TTT_Section(db.Model):
+class TTT_Section():
   def __init__(self, num_cells):
     # bit array representing 'X's (1), 'O's (0), and null (infinity)
     self.cells = []
