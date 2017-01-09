@@ -1,6 +1,11 @@
+from ttt_app import db
 import ttt_rep
 
-class TTT_Game:
+class TTT_Game(db.Model):
+  id = db.Column(db.Integer, primary_key=True)
+  board = db.relationship("TTT_Board", uselist=False, back_populates="TTT_Game")
+  turn_rep = db.Column(db.Boolean)
+
   def __init__(self):
     # Must initialize board with dimensions indicated
     # in game play or 3 x 3 if not indicated
@@ -30,7 +35,3 @@ class TTT_Game:
       if diag.is_complete():
         return True
     return False
-
-  def play(self):
-    # TODO - accept input from users and invalidate input
-    pass

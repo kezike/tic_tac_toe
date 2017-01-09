@@ -9,16 +9,16 @@ games = Table('games', metadata,
              Column('board_id', String),
              Column('player1_uname', String),
              Column('player2_uname', String),
-             Column('turn', Unicode),
+             Column('turn', String(1)),
              Column('is_over', Boolean)
 )
 
 boards = Table('boards', metadata,
               Column('id', Integer, primary_key=True), 
-              Column('turn', Unicode)
+              Column('turn', String(1))
 )
 
 players = Table('players', metadata,
                Column('id', Integer, primary_key=True), 
-               Column('piece', Unicode)
+               Column('piece', String(1))
 )

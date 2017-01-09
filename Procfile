@@ -1,1 +1,1 @@
-web: python ttt_server.py
+web: python ttt_app.py

@@ -1,11 +1,16 @@
 import os
 import re
-import ttt_game
-import ttt_rep
 from slackclient import SlackClient
 from flask import Flask, request, session, g, redirect, url_for, render_template, flash, jsonify, abort
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["DATABASE_URL"]
+db = SQLAlchemy(app)
+
+import ttt_game
+import ttt_rep
+
 
 HOST = "/kayode-ezike-ttt.herokuapp.com"
 PORT = 5000
@@ -168,10 +173,10 @@ def ttt_handler():
         return "```Cannot end game before starting game. Type '/ttt start [DIM]' (where 1 <= DIM <= 26) to play a new game.```"
       # TODO - Update db with flushed board and features
       return "```Game Ended! Thanks for playing Tic Tac Toe :}```"
-    # Display manual
+    # Display /ttt docs
     elif help_match:
-      manual = open("ttt_manual.txt", 'r')
-      return manual.read()
+      docs = open("ttt_docs.txt", 'r')
+      return docs.read()
     else:
       return "```Illegal command format! Type '/ttt help' for legal command formatting.```"
   return "OK"

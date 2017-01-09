@@ -1,3 +1,5 @@
+from flask_sqlalchemy import SQLAlchemy
+from ttt_app import db
 import string
 
 ALPHA = string.ascii_lowercase
@@ -5,7 +7,14 @@ NUM_LETTERS = len(ALPHA)
 INF = float("inf")
 
 # Represents a cell in a tic tac toe board
-class TTT_Cell:
+class TTT_Cell(db.Model):
+  id = db.Column(db.Integer, primary_key=True)
+  value = db.Column(db.String(1))
+  row = db.Column(db.Integer)
+  col = db.Column(db.Integer)
+  board_id = db.Column(db.Integer, db.ForeignKey("TTT_Board.id"))
+  board = db.relationship("TTT_Board", back_populates="cells")
+
   def __init__(self):
     self.value = ' '
 
@@ -16,25 +25,30 @@ class TTT_Cell:
     return '|', self.value, '|'
 
 # Represents a section in a tic tac toe board
-class TTT_Section:
-  def __init__(self):
+class TTT_Section(db.Model):
+  def __init__(self, num_cells):
     # bit array representing 'X's (1), 'O's (0), and null (infinity)
     self.cells = []
-    self.NUM_CELLS = INF
+    self.NUM_CELLS = num_cells
     self.num_insertions = 0
-    self.last_insertion = INF
+    # Special value representing the last value to be inserted into the section
+    # Begins at 30 in the beginning because there will never be up to 30 pieces
+    # considering that the max number of insertions is 26. However, when we encounter
+    # this value, we can safely assume that this is the initial case, in which there
+    # has not yet been any insertions
+    self.last_insertion = 30
     self.matches = True
 
   def insert(self, val):
     if val == 'X':
       self.cells.append(1)
       self.num_insertions += 1
-      self.matches = self.matches and (self.last_insertion == 1 or self.last_insertion == INF)
+      self.matches = self.matches and (self.last_insertion == 1 or self.last_insertion == 30)
       self.last_insertion = 1
     elif val == 'O':
       self.cells.append(0)
       self.num_insertions += 1
-      self.matches = self.matches and (self.last_insertion == 0 or self.last_insertion == INF)
+      self.matches = self.matches and (self.last_insertion == 0 or self.last_insertion == 30)
       self.last_insertion = 0
   
   def is_complete(self):
@@ -63,7 +77,7 @@ class TTT_Diag(TTT_Section):
     # TODO
     pass
 
-# Represents a tic tac toe board
+# Represents a square tic tac toe board
 # File - letter
 # Rank - number
 """
@@ -75,8 +89,16 @@ Tic Tac Toe
 1 |   |   |   |
     a   b   c 
 """
-class TTT_Board:
+class TTT_Board(db.Model):
+  id = db.Column(db.Integer, primary_key=True)
+  game_id = db.Column(db.Integer, db.ForeignKey("TTT_Game.id"))
+  game = db.relationship("TTT_Game", back_populates="TTT_Board")
+  cells = db.relationship("TTT_Cell", order_by="TTT_Cell.row", back_populates="TTT_Board")
+  turn_rep = db.Column(db.Boolean)
+  printed_board = db.Column(db.String)
+
   def __init__(self, dim=3):
+    self.DIM = dim
     self.NUM_ROWS = dim
     self.NUM_COLS = dim
     # Turn represented as boolean,
@@ -103,24 +125,20 @@ class TTT_Board:
     self.diags = []
     # Setup rows, cols, and diags
     for i in xrange(self.NUM_ROWS):
-      row = TTT_Row()
-      row.NUM_CELLS = self.NUM_COLS
+      row = TTT_Row(self.NUM_COLS)
       for j in xrange(self.NUM_COLS):
         cell = TTT_Cell()
         self.rows.append(row)
         if j >= len(self.cols):
-          col = TTT_Col()
-          col.NUM_CELLS = self.NUM_ROWS
+          col = TTT_Col(self.NUM_ROWS)
           self.cols.append(col)
         if i == j:
           if len(self.diags) == 0:
-            diag = TTT_Diag()
-            diag.NUM_CELLS = self.NUM_COLS
+            diag = TTT_Diag(self.NUM_COLS)
             self.diags.append(diag)
         elif i + j == self.NUM_ROWS - 1:
           if len(self.diags) == 1:
-            diag = TTT_Diag()
-            diag.NUM_CELLS = self.NUM_COLS
+            diag = TTT_Diag(self.NUM_COLS)
             self.diags.append(diag)
         self.cells.append(cell)
 

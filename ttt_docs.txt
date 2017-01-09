@@ -1,6 +1,5 @@
 ```
-/ttt Manual
-
+/ttt docs
 Rules
 Tic Tac Toe is a two-player game in which each player is assigned a piece: 'x' or 'o'. The objective of the game is for a player to competitively align their piece in a contiguous section - along a row or column - or along a diagonal on the game board. In traditional Tic tac Toe, the board has dimensions of 3 x 3. However, in this version, players can configure the board dimensions up to 26 x 26.
 
