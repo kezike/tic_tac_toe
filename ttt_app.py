@@ -8,17 +8,14 @@ app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["DATABASE_URL"]
 db = SQLAlchemy(app)
 
-import ttt_game
 import ttt_rep
-
+this_game = ttt_rep.TTT_Game()
 
 HOST = "/kayode-ezike-ttt.herokuapp.com"
 PORT = 5000
 APP_TOKEN = os.environ["APP_TOKEN"]
 OAUTH_TOKEN = os.environ["OAUTH_TOKEN"]
 SLACK_CLIENT = SlackClient(OAUTH_TOKEN)
-
-this_game = ttt_game.TTT_Game()
 
 # Convert Slack username to user id
 def uname_to_uid(uname):
