@@ -12,7 +12,7 @@ class TTT_Cell(db.Model):
   value = db.Column(db.String(1))
   row = db.Column(db.Integer)
   col = db.Column(db.Integer)
-  board_id = db.Column(db.Integer, db.ForeignKey("TTT_Board.id"))
+  board_id = db.Column(db.Integer, db.ForeignKey("TTT_Board"))
   board = db.relationship("TTT_Board", back_populates="cells")
 
   def __init__(self):
@@ -91,7 +91,7 @@ Tic Tac Toe
 """
 class TTT_Board(db.Model):
   id = db.Column(db.Integer, primary_key=True)
-  game_id = db.Column(db.Integer, db.ForeignKey("TTT_Game.id"))
+  game_id = db.Column(db.Integer, db.ForeignKey("TTT_Game"))
   game = db.relationship("TTT_Game", back_populates="TTT_Board")
   cells = db.relationship("TTT_Cell", order_by="TTT_Cell.row", back_populates="TTT_Board")
   turn_rep = db.Column(db.Boolean)
