@@ -95,9 +95,9 @@ Tic Tac Toe
 """
 class Board(db.Model):
   id = db.Column(db.Integer, primary_key=True)
-  game_id = db.Column(db.Integer, db.ForeignKey("game.id"))
-  game = db.relationship("Game", back_populates="board")
-  cells = db.relationship("Cell", order_by="Cell.row", back_populates="board")
+  game_id = db.Column(db.Integer, db.ForeignKey("Game.id"))
+  game = db.relationship("Game", back_populates="Board")
+  cells = db.relationship("Cell", order_by="Cell.row", back_populates="Board")
   turn_rep = db.Column(db.Boolean)
   board_str = db.Column(db.String)
 
@@ -153,7 +153,7 @@ class Board(db.Model):
         self.row_delim += '+'
     self.row_delim += '|'
 
-    # Cache printed board
+    # Cache board string
     # Ticks, underscores, and asterisks are for Slack formatting
     self.board_str = ""
     for i in xrange(self.NUM_ROWS):
@@ -245,7 +245,7 @@ class Game(db.Model):
   player_id_x = db.Column(db.String)
   player_id_o = db.Column(db.String)
   channel_id = db.Column(db.String)
-  board = db.relationship("Board", uselist=False, back_populates="game")
+  board = db.relationship("Board", uselist=False, back_populates="Game")
   turn_rep = db.Column(db.Boolean)
   
   def __init__(self, pid_x, pid_o, ch_id, turn_rep):
