@@ -165,6 +165,7 @@ def ttt_handler():
   user_id = request.form.get('user_id', None)
   ch_id = request.form.get('channel_id', None)
   channel_games = ttt_rep.Game.query.filter_by(channel_id=ch_id)
+  print channel_games + ": " + channel_games 
   channel_game_count = channel_games.count()
 
   # Validate parameters
