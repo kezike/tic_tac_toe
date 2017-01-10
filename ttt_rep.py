@@ -238,7 +238,7 @@ class Board(db.Model):
 
 class Game(db.Model):
   id = db.Column(db.Integer, primary_key=True)
-  channel = db.relationship("Channel.channel_id", uselist=False, back_populates="game")
+  channel = db.relationship("Channel", uselist=False, back_populates="game")
   board = db.relationship("Board", uselist=False, back_populates="game")
   turn_rep = db.Column(db.Boolean)
 
