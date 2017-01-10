@@ -95,7 +95,7 @@ class Board(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   game_id = db.Column(db.Integer, db.ForeignKey("game.id"))
   game = db.relationship("Game", back_populates="board")
-  cells = db.relationship("Cell", order_by="cell.id", back_populates="board")
+  cells = db.relationship("Cell", order_by="Cell.row", back_populates="board")
   turn_rep = db.Column(db.Boolean)
   printed_board = db.Column(db.String)
 
