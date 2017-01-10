@@ -1,3 +1,5 @@
+import string
+
 ALPHA = string.ascii_lowercase
 NUM_LETTERS = len(ALPHA)
 INF = float("inf")

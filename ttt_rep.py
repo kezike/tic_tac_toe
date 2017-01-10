@@ -1,6 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
 from ttt_app import db
-import string
 import ttt_util
 
 UTIL = ttt_util.Util()
