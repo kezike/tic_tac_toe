@@ -65,7 +65,7 @@ def start_handler(cmd_input, own_uid):
     opp_uname = uname_handle.split('@')[1]
     opp_uid = uname_to_uid(opp_uname)
     start_response = "```@" + own_uname + " (X) is challenging @" + opp_uname + " (O) " + "to a game of Tic Tac Toe...```\n" + start_response
-    this_game.board = ttt_rep.TTT_Board(3)
+    this_game.board = ttt_rep.Board(3)
     board = this_game.board
   elif start_and_restart_flex_match:
     exact_start_flex_match = re.match("^start ([1-9]|[1-2][0-6])$", cmd_input)
@@ -83,7 +83,7 @@ def start_handler(cmd_input, own_uid):
     opp_uname = uname_handle.split('@')[1]
     opp_uid = uname_to_uid(opp_uname)
     start_response = "```@" + uid_to_uname(own_uid) + " (X) is challenging @" + opp_uname + " (O) " + "to a game of Tic Tac Toe...```\n" + start_response
-    this_game.board = ttt_rep.TTT_Board(int(dim))
+    this_game.board = ttt_rep.Board(int(dim))
     board = this_game.board
   else:
     # Command contains "start", but is not of a legal format
@@ -180,6 +180,6 @@ def ttt_handler():
 
 if __name__ == "__main__":
   import ttt_rep
-  this_game = ttt_rep.TTT_Game()
+  this_game = ttt_rep.Game()
   port = int(os.environ.get("PORT", 5000))
   app.run(host='', port=port)

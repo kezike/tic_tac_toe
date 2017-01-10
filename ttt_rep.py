@@ -7,7 +7,7 @@ NUM_LETTERS = len(ALPHA)
 INF = float("inf")
 
 # Represents a cell in a tic tac toe board
-class TTT_Cell(db.Model):
+class Cell(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   value = db.Column(db.String(1))
   row = db.Column(db.Integer)
@@ -27,7 +27,7 @@ class TTT_Cell(db.Model):
     return '|', self.value, '|'
 
 # Represents a section in a tic tac toe board
-class TTT_Section():
+class Section():
   def __init__(self, num_cells):
     # bit array representing 'X's (1), 'O's (0), and null (infinity)
     self.cells = []
@@ -62,19 +62,19 @@ class TTT_Section():
     pass
 
 # Represents a row in a tic tac toe board
-class TTT_Row(TTT_Section):
+class Row(Section):
   def __str__(self):
     # TODO
     pass
 
 # Represents a columnn in a tic tac toe board
-class TTT_Col(TTT_Section):
+class Col(Section):
   def __str__(self):
     # TODO
     pass
 
 # Represents a diagonal in a tic tac toe board
-class TTT_Diag(TTT_Section):
+class Diag(Section):
   def __str__(self):
     # TODO
     pass
@@ -91,7 +91,7 @@ Tic Tac Toe
 1 |   |   |   |
     a   b   c 
 """
-class TTT_Board(db.Model):
+class Board(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   game_id = db.Column(db.Integer, db.ForeignKey("ttt_game.id"))
   game = db.relationship("ttt_game", back_populates="ttt_board")
@@ -127,20 +127,20 @@ class TTT_Board(db.Model):
     self.diags = []
     # Setup rows, cols, and diags
     for i in xrange(self.NUM_ROWS):
-      row = TTT_Row(self.NUM_COLS)
+      row = Row(self.NUM_COLS)
       for j in xrange(self.NUM_COLS):
-        cell = TTT_Cell(i, j, ' ')
+        cell = Cell(i, j, ' ')
         self.rows.append(row)
         if j >= len(self.cols):
-          col = TTT_Col(self.NUM_ROWS)
+          col = Col(self.NUM_ROWS)
           self.cols.append(col)
         if i == j:
           if len(self.diags) == 0:
-            diag = TTT_Diag(self.NUM_COLS)
+            diag = Diag(self.NUM_COLS)
             self.diags.append(diag)
         elif i + j == self.NUM_ROWS - 1:
           if len(self.diags) == 1:
-            diag = TTT_Diag(self.NUM_COLS)
+            diag = Diag(self.NUM_COLS)
             self.diags.append(diag)
         self.cells.append(cell)
 
@@ -254,9 +254,9 @@ class TTT_Board(db.Model):
     self.state_changed = False 
     return self.printed_board
 
-class TTT_Game(db.Model):
+class Game(db.Model):
   id = db.Column(db.Integer, primary_key=True)
-  board = db.relationship("TTT_Board", uselist=False, back_populates="TTT_Game")
+  board = db.relationship("Board", uselist=False, back_populates="Game")
   turn_rep = db.Column(db.Boolean)
 
   def __init__(self):
