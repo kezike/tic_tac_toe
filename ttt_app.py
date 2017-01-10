@@ -106,8 +106,8 @@ def start_handler(cmd_input, own_uid, ch_id):
     return "```Illegal command format! Type '/ttt help' for legal command formatting.```"
   # TODO - Calculate TURN_USERNAME
   start_response += this_board.__str__()
-  db.session.merge(this_game)
-  db.session.merge(this_board)
+  # db.session.merge(this_game)
+  # db.session.merge(this_board)
   db.session.merge(player_x)
   db.session.merge(player_y)
   db.session.commit()
