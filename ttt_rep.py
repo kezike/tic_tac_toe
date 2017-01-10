@@ -13,10 +13,11 @@ class Cell(db.Model):
   board_id = db.Column(db.Integer, db.ForeignKey("board.id"))
   board = db.relationship("Board", back_populates="cells")
 
-  def __init__(self, row, col, val):
+  def __init__(self, board, row, col, val):
     self.row = row
     self.col = col
     self.value = val
+    self.board = board
 
   def insert(self, val):
     self.value = val
@@ -28,7 +29,7 @@ class Cell(db.Model):
     return '|', self.value, '|'
 
 # Represents a section in a tic tac toe board
-class Section():
+class Section:
   def __init__(self, num_cells):
     # bit array representing 'X's (1), 'O's (0), and null (infinity)
     self.cells = []
@@ -98,7 +99,7 @@ class Board(db.Model):
   game = db.relationship("Game", back_populates="board")
   cells = db.relationship("Cell", order_by="Cell.row", back_populates="board")
   turn_rep = db.Column(db.Boolean)
-  printed_board = db.Column(db.String)
+  board_str = db.Column(db.String)
 
   def __init__(self, dim=3):
     self.DIM = dim
@@ -127,7 +128,8 @@ class Board(db.Model):
     for i in xrange(self.NUM_ROWS):
       row = Row(self.NUM_COLS)
       for j in xrange(self.NUM_COLS):
-        cell = Cell(i, j, ' ')
+        cell = Cell(self, i, j, ' ')
+        db.session.add(cell)
         self.rows.append(row)
         if j >= len(self.cols):
           col = Col(self.NUM_ROWS)
@@ -141,9 +143,10 @@ class Board(db.Model):
             diag = Diag(self.NUM_COLS)
             self.diags.append(diag)
         self.cells.append(cell)
+    db.session.commit()
 
     # Calculate row delimiter in printed board: |---+---+---|
-    self.row_delim = '|' 
+    self.row_delim = '|'
     for j in xrange(self.NUM_COLS):
       self.row_delim += "---"
       if j != self.NUM_COLS - 1:
@@ -152,24 +155,24 @@ class Board(db.Model):
 
     # Cache printed board
     # Ticks, underscores, and asterisks are for Slack formatting
-    self.printed_board = ""
+    self.board_str = ""
     for i in xrange(self.NUM_ROWS):
       rank_str = str(self.NUM_ROWS - i)
-      self.printed_board += rank_str
+      self.board_str += rank_str
       if len(rank_str) == 1:
-        self.printed_board += ' '
+        self.board_str += ' '
       for j in xrange(self.NUM_COLS):
-        self.printed_board += '|   '
+        self.board_str += '|   '
         if j == self.NUM_COLS - 1:
-          self.printed_board += '|'
+          self.board_str += '|'
           if i != self.NUM_ROWS - 1:
-            self.printed_board += '\n' + "  " + self.row_delim + '\n'
+            self.board_str += '\n' + "  " + self.row_delim + '\n'
     file_delim = "   "
     file_string = "\n "
     for j in xrange(self.NUM_COLS):
       file_string += file_delim + UTIL.rep_to_fil[j]
-    self.printed_board += file_string
-    self.printed_board += "```"
+    self.board_str += file_string
+    self.board_str += "```"
     self.state_changed = True
   
     # Configure square dimension of board
@@ -214,40 +217,45 @@ class Board(db.Model):
 
   def __str__(self):
     if not self.state_changed:
-      return self.printed_board 
-    self.printed_board = ""
+      return self.board_str
+    self.board_str = ""
     for i in xrange(self.NUM_ROWS):
       rank_str = str(self.NUM_ROWS - i)
-      self.printed_board += rank_str
+      self.board_str += rank_str
       if len(rank_str) == 1:
-        self.printed_board += ' '
+        self.board_str += ' '
       for j in xrange(self.NUM_COLS):
-        self.printed_board += '| ' + self.get_cell(self.rep_to_file(j), self.rep_to_rank(i)).value + ' '
+        self.board_str += '| ' + self.get_cell(self.rep_to_file(j), self.rep_to_rank(i)).value + ' '
         if j == self.NUM_COLS - 1:
-          self.printed_board += '|'
+          self.board_str += '|'
           if i != self.NUM_ROWS - 1:
-            self.printed_board += '\n' + "  " + self.row_delim + '\n'
+            self.board_str += '\n' + "  " + self.row_delim + '\n'
     file_delim = "   "
     file_string = "\n "
     for j in xrange(self.NUM_COLS):
       file_string += file_delim + self.rep_to_file(j)
-    self.printed_board += file_string
-    self.printed_board += "```"
+    self.board_str += file_string
+    self.board_str += "```"
     self.state_changed = False 
-    return self.printed_board
+    return self.board_str
 
+# Represents a game of tic tac toe
 class Game(db.Model):
   id = db.Column(db.Integer, primary_key=True)
-  ch_id = db.Column(db.Integer, db.ForeignKey("channel.id"))
-  channel = db.relationship("Channel", uselist=False, back_populates="game")
+  player_id_x = db.Column(db.String)
+  player_id_o = db.Column(db.String)
+  channel_id = db.Column(db.String)
   board = db.relationship("Board", uselist=False, back_populates="game")
   turn_rep = db.Column(db.Boolean)
-
-  def __init__(self):
+  
+  def __init__(self, pid_x, pid_o, ch_id, turn_rep):
     # Must initialize board with dimensions indicated
     # in game play or 3 x 3 if not indicated
+    self.player_id_x = pid_x
+    self.player_id_o = pid_o
+    self.channel_id = ch_id
+    self.turn_rep = turn_rep
     self.board = None
-    self.turn_rep = True
   
   def make_move(self, fil, rnk, val):
     self.board.insert(fil, rnk, val)
@@ -269,25 +277,15 @@ class Game(db.Model):
         return True
     return False
   
-class Channel(db.Model):
-  id = db.Column(db.Integer, primary_key=True)
-  channel_id = db.Column(db.String)
-  game = db.relationship("Game", uselist=False, back_populates="channel")
-
-  def __init__(self, ch_id):
-    self.channel_id = ch_id
-
-  def __repr__(self):
-    return "<Channel %r>" % self.ch_id
-
+# Represents a player of tic tac toe
 class Player(db.Model):
   id = db.Column(db.Integer, primary_key=True)
-  turn_rep = db.Column(db.Boolean)
-  username = db.Column(db.String)
+  piece_rep = db.Column(db.Boolean)
+  player_id = db.Column(db.String)
 
-  def __init__(self, turn_rep, uname):
-    self.turn_rep = turn_rep
-    self.username = uname
+  def __init__(self, piece_rep, pid):
+    self.piece_rep = piece_rep
+    self.player_id = pid
 
   def __repr__(self):
     "<Player %r (@%r)>" % (UTIL.rep_to_piece(self.turn_rep), self.username)

@@ -14,8 +14,8 @@ def singleton(cls):
 
 class Util:
   def __init__(self):
-    # Turn represented as boolean,
-    # where True = X and False = O
+    # Piece represented as boolean,
+    # where True = 'X' and False = 'O'
     self.rep_to_pce = {True: 'X', False: 'O'}
 
     # Convert file to cell index

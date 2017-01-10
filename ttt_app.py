@@ -9,6 +9,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["DATABASE_URL"]
 db = SQLAlchemy(app)
 
 this_game = None
+this_board = None
 
 import ttt_util
 UTIL = ttt_util.Util()
@@ -39,11 +40,8 @@ def uid_to_uname(uid):
   return None
 
 # Specifies response to start/restart command
-def start_handler(cmd_input, own_uid):
-  board = this_game.board
-  turn_rep = this_game.turn_rep
-  # Confirm from user info in request payload
-  turn = UTIL.rep_to_piece(turn_rep) 
+def start_handler(cmd_input, own_uid, ch_id):
+  import ttt_rep
   own_uname = uid_to_uname(own_uid)
   start_response = "```Turn: X (@" + own_uname + ")\n"
   # Regex for invoking default-size board (3 x 3)
@@ -66,8 +64,12 @@ def start_handler(cmd_input, own_uid):
     opp_uname = uname_handle.split('@')[1]
     opp_uid = uname_to_uid(opp_uname)
     start_response = "```@" + own_uname + " (X) is challenging @" + opp_uname + " (O) " + "to a game of Tic Tac Toe...```\n" + start_response
+    this_game = ttt_rep.Game(own_uid, opp_uid, ch_id, True)
+    turn_rep = this_game.turn_rep
+    # TODO - Confirm from user info in request payload
+    turn = UTIL.rep_to_piece(turn_rep) 
     this_game.board = ttt_rep.Board(3)
-    board = this_game.board
+    this_board = this_game.board
   elif start_and_restart_flex_match:
     exact_start_flex_match = re.match("^start ([1-9]|[1-2][0-6])$", cmd_input)
     if exact_start_flex_match:
@@ -84,18 +86,25 @@ def start_handler(cmd_input, own_uid):
     opp_uname = uname_handle.split('@')[1]
     opp_uid = uname_to_uid(opp_uname)
     start_response = "```@" + uid_to_uname(own_uid) + " (X) is challenging @" + opp_uname + " (O) " + "to a game of Tic Tac Toe...```\n" + start_response
+    this_game = ttt_rep.Game(own_uid, opp_uid, ch_id, True)
+    turn_rep = this_game.turn_rep
+    # TODO - Confirm from user info in request payload
+    turn = UTIL.rep_to_piece(turn_rep) 
     this_game.board = ttt_rep.Board(int(dim))
-    board = this_game.board
+    this_board = this_game.board
   else:
     # Command contains "start", but is not of a legal format
     return "```Illegal command format! Type '/ttt help' for legal command formatting.```"
   # TODO - Calculate TURN_USERNAME
-  start_response += board.__str__()
+  start_response += this_board.__str__()
+  db.session.add(this_game)
+  db.session.add(this_board)
+  db.session.commit()
   return start_response
 
 # Specifies response to move command
 def move_handler(cmd_input): 
-  board = this_game.board
+  this_board = this_game.board
   (move_cmd, fil_rnk_str) = cmd_input.split(' ')
   fil_str = fil_rnk_str[0]
   rnk_str = fil_rnk_str[1:]
@@ -105,13 +114,13 @@ def move_handler(cmd_input):
   if not move_bounds_match:
     return "```Position (FILE, RANK) is out of bounds! a <= FILE <= max(a, min(z, MAX_FILE)), where MAX_FILE is the largest lexicographical letter for the board's dimension.```"
   # Check if file and rank locally in bounds (within board dimensions)
-  dim_str = str(board.NUM_ROWS)
-  if board.NUM_ROWS < 10:
-    move_bounds_match = re.match("^move [a-" + board.MAX_FILE + "][1-" + dim_str + "]$", cmd_input)
+  dim_str = str(this_board.NUM_ROWS)
+  if this_board.NUM_ROWS < 10:
+    move_bounds_match = re.match("^move [a-" + this_board.MAX_FILE + "][1-" + dim_str + "]$", cmd_input)
   else:
     dim_first_dig = dim_str[0]
     dim_sec_dig = dim_str[1]
-    move_bounds_match = re.match("^move [a-" + board.MAX_FILE + "][1-" + dim_first_dig + ']' + "[0-" + dim_sec_dig + "]$", cmd_input)
+    move_bounds_match = re.match("^move [a-" + this_board.MAX_FILE + "][1-" + dim_first_dig + ']' + "[0-" + dim_sec_dig + "]$", cmd_input)
   if not move_bounds_match:
     return "```Position (FILE, RANK) is out of bounds! a <= FILE <= max(a, min(z, MAX_FILE)), where MAX_FILE is the largest lexicographical letter for the board's dimension.```"
   turn_rep = this_game.turn_rep
@@ -120,7 +129,7 @@ def move_handler(cmd_input):
   this_game.make_move(fil_str, rnk, turn)
   turn_rep = this_game.turn_rep
   # TODO - Calculate TURN_USERNAME
-  move_response = "```Turn: " + UTIL.rep_to_piece(turn_rep) + " (@TURN_USERNAME)\n" + board.__str__()
+  move_response = "```Turn: " + UTIL.rep_to_piece(turn_rep) + " (@TURN_USERNAME)\n" + this_board.__str__()
   return move_response
 
 @app.route('/', methods=['POST'])
@@ -140,9 +149,9 @@ def ttt_handler():
       "response_type": "ephemeral",
       "text": "Your app is not entitled to access the '/ttt' bot! :P"
     })
-  board = this_game.board
+  this_board = this_game.board
   turn_rep = this_game.turn_rep
-  # Confirm from user info in request payload
+  # TODO - Confirm from user info in request payload
   turn = UTIL.rep_to_piece(turn_rep)
   if command == "/ttt":
     start_match = re.search("start", command_input)
@@ -157,13 +166,13 @@ def ttt_handler():
       # set opponent's piece to 'O', and display board
       if channel_game_count > 0:
         return "```Game already in progress in current channel! Run '/ttt display' to display status of current game or '/ttt restart' to start new game.```"
-      return start_handler(command_input, user_id)
+      return start_handler(command_input, user_id, ch_id)
     # Display board
     elif display_match:
       if channel_game_count == 0:
         return "```Cannot display board before starting game. Type '/ttt start [DIM]' (where 1 <= DIM <= 26) to play a new game.```"
       # TODO - Calculate TURN_USERNAME
-      display_response = "```Turn: " + UTIL.rep_to_piece(turn_rep) + " (@TURN_USERNAME)\n" + board.__str__()
+      display_response = "```Turn: " + UTIL.rep_to_piece(turn_rep) + " (@TURN_USERNAME)\n" + this_board.__str__()
       return display_response
     # Make move
     elif move_match:
@@ -185,7 +194,5 @@ def ttt_handler():
   return "OK"
 
 if __name__ == "__main__":
-  import ttt_rep
-  this_game = ttt_rep.Game()
   port = int(os.environ.get("PORT", 5000))
   app.run(host='', port=port)
