@@ -1,8 +1,12 @@
 import os
 import re
+import logging
 from slackclient import SlackClient
 from flask import Flask, request, session, g, redirect, url_for, render_template, flash, jsonify, abort
 from flask_sqlalchemy import SQLAlchemy
+
+logging.basicConfig()
+logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["DATABASE_URL"]
