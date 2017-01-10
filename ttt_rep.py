@@ -270,6 +270,7 @@ class Game(db.Model):
   
 class Channel(db.Model):
   id = db.Column(db.Integer, primary_key=True)
+  channel_id = db.Column(db.String)
 
   def __init__(self, ch_id):
     self.channel_id = ch_id
