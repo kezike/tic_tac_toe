@@ -256,7 +256,7 @@ class Board(db.Model):
 
 class Game(db.Model):
   id = db.Column(db.Integer, primary_key=True)
-  board = db.relationship("Board", uselist=False, back_populates="Game")
+  board = db.relationship("board", uselist=False, back_populates="game")
   turn_rep = db.Column(db.Boolean)
 
   def __init__(self):
