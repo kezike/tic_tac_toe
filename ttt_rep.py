@@ -245,7 +245,7 @@ class Game(db.Model):
   player_id_x = db.Column(db.String)
   player_id_o = db.Column(db.String)
   channel_id = db.Column(db.String)
-  board = db.relationship("Board", uselist=False, back_populates="game")
+  board = db.relationship("Board", uselist=False, back_populates="Game")
   turn_rep = db.Column(db.Boolean)
   
   def __init__(self, pid_x, pid_o, ch_id, turn_rep):
