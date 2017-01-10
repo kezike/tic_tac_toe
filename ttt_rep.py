@@ -13,7 +13,7 @@ class Cell(db.Model):
   row = db.Column(db.Integer)
   col = db.Column(db.Integer)
   board_id = db.Column(db.Integer, db.ForeignKey("board.id"))
-  board = db.relationship("board", back_populates="cells")
+  board = db.relationship("Board", back_populates="cells")
 
   def __init__(self, row, col, val):
     self.row = row
@@ -94,8 +94,8 @@ Tic Tac Toe
 class Board(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   game_id = db.Column(db.Integer, db.ForeignKey("game.id"))
-  game = db.relationship("game", back_populates="board")
-  cells = db.relationship("cell", order_by="cell.row", back_populates="board")
+  game = db.relationship("Game", back_populates="board")
+  cells = db.relationship("Cell", order_by="cell.row", back_populates="board")
   turn_rep = db.Column(db.Boolean)
   printed_board = db.Column(db.String)
 
@@ -256,7 +256,7 @@ class Board(db.Model):
 
 class Game(db.Model):
   id = db.Column(db.Integer, primary_key=True)
-  board = db.relationship("board", uselist=False, back_populates="game")
+  board = db.relationship("Board", uselist=False, back_populates="game")
   turn_rep = db.Column(db.Boolean)
 
   def __init__(self):
