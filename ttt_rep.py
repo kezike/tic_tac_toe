@@ -238,6 +238,7 @@ class Board(db.Model):
 
 class Game(db.Model):
   id = db.Column(db.Integer, primary_key=True)
+  ch_id = db.Column(db.Integer, db.ForeignKey("channel.id"))
   channel = db.relationship("Channel", uselist=False, back_populates="game")
   board = db.relationship("Board", uselist=False, back_populates="game")
   turn_rep = db.Column(db.Boolean)
@@ -271,6 +272,7 @@ class Game(db.Model):
 class Channel(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   channel_id = db.Column(db.String)
+  game = db.relationship("Game", uselist=False, back_populates="channel")
 
   def __init__(self, ch_id):
     self.channel_id = ch_id
