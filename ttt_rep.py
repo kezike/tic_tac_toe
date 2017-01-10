@@ -95,7 +95,7 @@ Tic Tac Toe
 """
 class Board(db.Model):
   id = db.Column(db.Integer, primary_key=True)
-  # game_id = db.Column(db.Integer, db.ForeignKey("game.id"))
+  game_id = db.Column(db.Integer, db.ForeignKey("game.id"))
   game = db.relationship("Game")
   cells = db.relationship("Cell")
   turn_rep = db.Column(db.Boolean)
