@@ -18,6 +18,10 @@ PORT = 5000
 APP_TOKEN = os.environ["APP_TOKEN"]
 OAUTH_TOKEN = os.environ["OAUTH_TOKEN"]
 SLACK_CLIENT = SlackClient(OAUTH_TOKEN)
+USER_NOT_FOUND_ERROR = "```No such user in this Slack!```"
+USER_NOT_IN_CHANNEL_ERROR = "```No such user in this channel!```"
+WRONG_USER_ERROR = "```It is not your turn to play! Please wait for your opponent to make their move.```"
+OAUTH_ERROR = "```You are not authenticated to use this Slack API call! Configure your application environment with proper permissions.```"
 
 # Convert Slack username to user id
 def uname_to_uid(uname):
@@ -27,9 +31,9 @@ def uname_to_uid(uname):
     for member in members:
       if member["name"] == uname:
         return member["id"]
-    return "No such user!"
+    return USER_NOT_FOUND_ERROR
   # Unable to authenticate
-  return None
+  return OAUTH_ERROR
 
 # Convert Slack user id to username
 def uid_to_uname(uid):
@@ -37,11 +41,20 @@ def uid_to_uname(uid):
   if user_info_res["ok"]:
     return user_info_res["user"]["name"]
   # Unable to authenticate
-  return None
+  return OAUTH_ERROR
+
+# Check if user is a member of a Slack channel
+def user_in_channel(uid, ch_id):
+  channel_info_res = SLACK_CLIENT.api_call("channels.info", channel=ch_id)
+  if channel_info_res["ok"]:
+    return uid in channel_info_res["channel"]["members"]
+  return OAUTH_ERROR
 
 # Specifies response to start/restart command
 def start_handler(cmd_input, own_uid, ch_id):
   import ttt_rep
+  player_x = ttt_rep.Player(True, own_uid)
+  player_y = None # determined below
   own_uname = uid_to_uname(own_uid)
   start_response = "```Turn: X (@" + own_uname + ")\n"
   # Regex for invoking default-size board (3 x 3)
@@ -58,6 +71,9 @@ def start_handler(cmd_input, own_uid, ch_id):
     (start_and_restart_cmd, uname_handle) = cmd_input.split(' ')
     opp_uname = uname_handle.split('@')[1]
     opp_uid = uname_to_uid(opp_uname)
+    player_y = ttt_rep.Player(False, opp_uid)
+    if not user_in_channel(opp_uid, ch_id):
+      return USER_NOT_IN_CHANNEL_ERROR
     start_response = "```@" + own_uname + " (X) is challenging @" + opp_uname + " (O) " + "to a game of Tic Tac Toe...```\n" + start_response
     this_game = ttt_rep.Game(own_uid, opp_uid, ch_id, True)
     turn_rep = this_game.turn_rep
@@ -75,7 +91,10 @@ def start_handler(cmd_input, own_uid, ch_id):
     (start_and_restart_cmd, dim, uname_handle) = cmd_input.split(' ')
     opp_uname = uname_handle.split('@')[1]
     opp_uid = uname_to_uid(opp_uname)
-    start_response = "```@" + uid_to_uname(own_uid) + " (X) is challenging @" + opp_uname + " (O) " + "to a game of Tic Tac Toe...```\n" + start_response
+    player_y = ttt_rep.Player(False, opp_uid)
+    if not user_in_channel(opp_uid, ch_id):
+      return USER_NOT_IN_CHANNEL_ERROR
+    start_response = "```@" + uid_to_uname(own_uid) + " (X) is challenging @" + opp_uname + " (O) " + "to a game of tic tac toe...```\n" + start_response
     this_game = ttt_rep.Game(own_uid, opp_uid, ch_id, True)
     turn_rep = this_game.turn_rep
     # TODO - Confirm from user info in request payload
@@ -89,12 +108,21 @@ def start_handler(cmd_input, own_uid, ch_id):
   start_response += this_board.__str__()
   # db.session.add(this_game)
   # db.session.add(this_board)
+  # db.session.add(player_x)
+  # db.session.add(player_y)
   db.session.commit()
   return start_response
 
 # Specifies response to move command
-def move_handler(cmd_input): 
+def move_handler(cmd_input, own_uid, ch_id):
+  import = ttt_rep
+  this_game = ttt_rep.Game.query.filter_by(channel_id=ch_id).one()
+  this_player = ttt_rep.Player.query.filter_by(player_id=own_id).one()
+  piece_rep = this_player.piece_rep
   this_board = this_game.board
+  turn_rep = this_game.turn_rep
+  if turn_rep != piece_rep:
+    return WRONG_USER_ERROR
   (move_cmd, fil_rnk_str) = cmd_input.split(' ')
   fil_str = fil_rnk_str[0]
   rnk_str = fil_rnk_str[1:]
@@ -118,8 +146,14 @@ def move_handler(cmd_input):
   turn = UTIL.rep_to_piece(turn_rep)
   this_game.make_move(fil_str, rnk, turn)
   turn_rep = this_game.turn_rep
+  turn_uname = None
+  if turn_rep:
+    turn_uname = uid_to_uname(this_game.player_id_x)
+  else:
+    turn_uname = uid_to_uname(this_game.player_id_o)
   # TODO - Calculate TURN_USERNAME
-  move_response = "```Turn: " + UTIL.rep_to_piece(turn_rep) + " (@TURN_USERNAME)\n" + this_board.__str__()
+  move_response = "```Turn: " + UTIL.rep_to_piece(turn_rep) + " (@" + turn_uname + ")\n" + this_board.__str__()
+  db.session.commit()
   return move_response
 
 @app.route('/', methods=['POST'])
@@ -153,12 +187,12 @@ def ttt_handler():
       # If not, set caller's piece to 'X',
       # set opponent's piece to 'O', and display board
       if channel_game_count > 0:
-        return "```Game already in progress in current channel! Run '/ttt display' to display status of current game or '/ttt restart' to start a new game.```"
+        return "```Game already in progress in current channel! Run '/ttt display' to display status of current game or '/ttt restart @SLACK_USERNAME' to start a new game.```"
       return start_handler(command_input, user_id, ch_id)
     # Display board
     elif display_match:
       if channel_game_count == 0:
-        return "```Cannot display board before starting game. Type '/ttt start [DIM]' (where 1 <= DIM <= 26) to play a new game.```"
+        return "```Cannot display board before starting game. Type '/ttt start [DIM] @SLACK_USERNAME' (where 1 <= DIM <= 26) to play a new game.```"
       # TODO - Calculate TURN_USERNAME
       this_game = channel_games[0]
       this_board = this_game.board
@@ -173,12 +207,12 @@ def ttt_handler():
     # Make move
     elif move_match:
       if channel_game_count == 0:
-        return "```Cannot make move before starting game. Type '/ttt start [DIM]' (where 1 <= DIM <= 26) to play a new game.```"
-      return move_handler(command_input)
+        return "```Cannot make move before starting game. Type '/ttt start [DIM] @SLACK_USERNAME' (where 1 <= DIM <= 26) to play a new game.```"
+      return move_handler(command_input, user_id, ch_id)
     # End game
     elif end_match:
       if channel_game_count == 0:
-        return "```Cannot end game before starting game. Type '/ttt start [DIM]' (where 1 <= DIM <= 26) to play a new game.```"
+        return "```Cannot end game before starting game. Type '/ttt start [DIM] @SLACK_USERNAME' (where 1 <= DIM <= 26) to play a new game.```"
       # TODO - Update db with flushed board and features
       return "```Game Ended! Thanks for playing Tic Tac Toe :}```"
     # Display /ttt docs
