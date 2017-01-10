@@ -1,6 +1,5 @@
 import os
 import re
-import ttt_util
 from slackclient import SlackClient
 from flask import Flask, request, session, g, redirect, url_for, render_template, flash, jsonify, abort
 from flask_sqlalchemy import SQLAlchemy
@@ -11,6 +10,7 @@ db = SQLAlchemy(app)
 
 this_game = None
 
+import ttt_util
 UTIL = ttt_util.Util()
 HOST = "/kayode-ezike-ttt.herokuapp.com"
 PORT = 5000
