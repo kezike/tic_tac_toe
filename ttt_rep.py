@@ -11,7 +11,7 @@ class Cell(db.Model):
   row = db.Column(db.Integer)
   col = db.Column(db.Integer)
   board_id = db.Column(db.Integer, db.ForeignKey("board.id"))
-  board = db.relationship("Board", backre="cells")
+  board = db.relationship("Board", backref="cells")
 
   def __init__(self, board, row, col, val):
     self.row = row
