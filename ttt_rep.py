@@ -245,6 +245,7 @@ class Game(db.Model):
   player_id_x = db.Column(db.String)
   player_id_o = db.Column(db.String)
   channel_id = db.Column(db.String)
+  board_id = db.Column(db.Integer, db.ForeignKey("board.id"))
   board = db.relationship("Board", uselist=False, back_populates="game")
   turn_rep = db.Column(db.Boolean)
   
