@@ -115,7 +115,7 @@ def start_handler(cmd_input, own_uid, ch_id):
 
 # Specifies response to move command
 def move_handler(cmd_input, own_uid, ch_id):
-  import = ttt_rep
+  import ttt_rep
   this_game = ttt_rep.Game.query.filter_by(channel_id=ch_id).one()
   this_player = ttt_rep.Player.query.filter_by(player_id=own_id).one()
   piece_rep = this_player.piece_rep
