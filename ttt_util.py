@@ -1,4 +1,11 @@
-@singleton
+def singleton(cls):
+  instances = {}
+  def getinstance():
+    if cls not in instances:
+      instances[cls] = cls()
+    return instances[cls]
+  return getinstance
+
 class Util:
   def __init__(self):
     # Turn represented as boolean,
@@ -20,3 +27,5 @@ class Util:
 
   def rep_to_piece(self, piece_rep):
     return self.rep_to_pce[piece_rep]
+
+Util = singleton(Util)
