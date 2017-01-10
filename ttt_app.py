@@ -49,13 +49,8 @@ def start_handler(cmd_input, own_uid, ch_id):
   # Regex for invoking configurable-size board
   start_and_restart_flex_match = re.match("^(re)?start ([1-9]|[1-2][0-6]) @[a-z0-9][a-z0-9._-]*$", cmd_input)
   if start_and_restart_match:
-    exact_start_match = re.match("^start @[a-z0-9][a-z0-9._-]*$", cmd_input)
-    if exact_start_match:
-      # Check if game is already in progress
-      # TODO - Check this from db
-      if board != None:
-        return "```Game already in progress! Type '/ttt restart' to start a new game.```"
-    else:
+    exact_restart_match = re.match("^restart @[a-z0-9][a-z0-9._-]*$", cmd_input)
+    if exact_restart_match:
       # End current game and start new game
       # TODO - Update db with flushed board and features and setup new board and features
       start_response = "```Ending current game and starting new game...```\n" + start_response
@@ -71,13 +66,8 @@ def start_handler(cmd_input, own_uid, ch_id):
     this_game.board = ttt_rep.Board(3)
     this_board = this_game.board
   elif start_and_restart_flex_match:
-    exact_start_flex_match = re.match("^start ([1-9]|[1-2][0-6])$", cmd_input)
-    if exact_start_flex_match:
-      # Check if game is already in progress
-      # TODO - Check this from db
-      if board != None:
-        return "```Game already in progress! Type '/ttt restart' to start a new game.```"
-    else:
+    exact_restart_flex_match = re.match("^restart ([1-9]|[1-2][0-6])$", cmd_input)
+    if exact_restart_flex_match:
       # End current game and start new game
       # TODO - Update db with flushed board and features and setup new board and features
       start_response = "```Ending current game and starting new game with desired configuration...```\n" + start_response
@@ -163,7 +153,7 @@ def ttt_handler():
       # If not, set caller's piece to 'X',
       # set opponent's piece to 'O', and display board
       if channel_game_count > 0:
-        return "```Game already in progress in current channel! Run '/ttt display' to display status of current game or '/ttt restart' to start new game.```"
+        return "```Game already in progress in current channel! Run '/ttt display' to display status of current game or '/ttt restart' to start a new game.```"
       return start_handler(command_input, user_id, ch_id)
     # Display board
     elif display_match:
