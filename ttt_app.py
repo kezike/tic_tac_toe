@@ -140,7 +140,8 @@ def ttt_handler():
   command_input = request.form.get('text', None)
   user_id = request.form.get('user_id', None)
   ch_id = request.form.get('channel_id', None)
-  channel_game_count = ttt_rep.Game.query.filter_by(channel_id=ch_id).count()
+  channel_games = ttt_rep.Game.query.filter_by(channel_id=ch_id)
+  channel_game_count = channel_games.count()
 
   # Validate parameters
   if not token or token != APP_TOKEN:
@@ -149,10 +150,7 @@ def ttt_handler():
       "response_type": "ephemeral",
       "text": "Your app is not entitled to access the '/ttt' bot! :P"
     })
-  this_board = this_game.board
-  turn_rep = this_game.turn_rep
   # TODO - Confirm from user info in request payload
-  turn = UTIL.rep_to_piece(turn_rep)
   if command == "/ttt":
     start_match = re.search("start", command_input)
     display_match = re.match("^display$", command_input) 
@@ -172,7 +170,15 @@ def ttt_handler():
       if channel_game_count == 0:
         return "```Cannot display board before starting game. Type '/ttt start [DIM]' (where 1 <= DIM <= 26) to play a new game.```"
       # TODO - Calculate TURN_USERNAME
-      display_response = "```Turn: " + UTIL.rep_to_piece(turn_rep) + " (@TURN_USERNAME)\n" + this_board.__str__()
+      this_game = channel_games[0]
+      this_board = this_game.board
+      turn_rep = this_game.turn_rep
+      turn_uname = None
+      if turn_rep:
+        turn_uname = uid_to_uname(this_game.player_id_x)
+      else:
+        turn_uname = uid_to_uname(this_game.player_id_o)
+      display_response = "```Turn: " + UTIL.rep_to_piece(turn_rep) + " (@" + turn_uname + ")\n" + this_board.__str__()
       return display_response
     # Make move
     elif move_match:
