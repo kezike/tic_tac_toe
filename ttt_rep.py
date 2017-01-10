@@ -1,7 +1,9 @@
 from flask_sqlalchemy import SQLAlchemy
 from ttt_app import db
 import string
+import ttt_util
 
+UTIL = ttt_util.Util()
 ALPHA = string.ascii_lowercase
 NUM_LETTERS = len(ALPHA)
 INF = float("inf")
@@ -22,6 +24,9 @@ class Cell(db.Model):
 
   def insert(self, val):
     self.value = val
+
+  def __repr__(self):
+    return '|', self.value, '|'
 
   def __str__(self):
     return '|', self.value, '|'
@@ -103,9 +108,6 @@ class Board(db.Model):
     self.DIM = dim
     self.NUM_ROWS = dim
     self.NUM_COLS = dim
-    # Turn represented as boolean,
-    # where True = X and False = O
-    self.rep_to_pce = {True: 'X', False: 'O'}
     self.turn_rep = True
     '''
     # Text above board
@@ -144,19 +146,6 @@ class Board(db.Model):
             self.diags.append(diag)
         self.cells.append(cell)
 
-    # Convert file to cell index
-    # (max file is 26 for alphabet)
-    file_iter = 0
-    self.fil_to_rep = {}
-    while file_iter < NUM_LETTERS:
-      self.fil_to_rep[ALPHA[file_iter]] = file_iter
-      file_iter += 1
-
-    # Convert cell index to file
-    self.rep_to_fil = {}
-    for (fil, rep) in self.fil_to_rep.iteritems():
-      self.rep_to_fil[rep] = fil
-
     # Calculate row delimiter in printed board: |---+---+---|
     self.row_delim = '|' 
     for j in xrange(self.NUM_COLS):
@@ -182,32 +171,26 @@ class Board(db.Model):
     file_delim = "   "
     file_string = "\n "
     for j in xrange(self.NUM_COLS):
-      file_string += file_delim + self.rep_to_fil[j]
+      file_string += file_delim + UTIL.rep_to_fil[j]
     self.printed_board += file_string
     self.printed_board += "```"
-    self.state_changed = False
+    self.state_changed = True
   
     # Configure square dimension of board
-    self.MAX_FILE = self.rep_to_fil[self.NUM_ROWS - 1]
-
-  # Converts boolean to turn piece
-  def rep_to_piece(self, piece_rep):
-    return self.rep_to_pce[piece_rep]
+    self.MAX_FILE = UTIL.rep_to_fil[self.NUM_ROWS - 1]
 
   # Converts file to cell index
   # (max file is 26 for alphabet)
   def file_to_rep(self, fil):
-    # TODO - assert valid file
-    return self.fil_to_rep[fil]
+    return UTIL.fil_to_rep[fil]
 
   # Converts rank to cell index
   def rank_to_rep(self, rnk):
-    # TODO - assert valid rank
     return self.NUM_ROWS - rnk
 
   # Converts cell index to file
   def rep_to_file(self, rep):
-    return self.rep_to_fil[rep]
+    return UTIL.rep_to_fil[rep]
 
   # Converts cell index to rank
   def rep_to_rank(self, rep):
@@ -229,6 +212,9 @@ class Board(db.Model):
     self.get_cell(fil, rnk).insert(val)    
     self.turn_rep = not self.turn_rep
     self.state_changed = True
+
+  def __repr__(self):
+    return "<Board %d x %d>" % (self.NUM_ROWS, self.NUM_COLS)
 
   def __str__(self):
     if not self.state_changed:
@@ -256,6 +242,7 @@ class Board(db.Model):
 
 class Game(db.Model):
   id = db.Column(db.Integer, primary_key=True)
+  channel = db.relationship("Channel.channel_id", uselist=False, back_populates="game")
   board = db.relationship("Board", uselist=False, back_populates="game")
   turn_rep = db.Column(db.Boolean)
 
@@ -263,12 +250,8 @@ class Game(db.Model):
     # Must initialize board with dimensions indicated
     # in game play or 3 x 3 if not indicated
     self.board = None
-    self.rep_to_pce = {True:'X', False:'O'}
     self.turn_rep = True
   
-  def rep_to_piece(self, piece_rep):
-    return self.rep_to_pce[piece_rep]
-
   def make_move(self, fil, rnk, val):
     self.board.insert(fil, rnk, val)
     # Now opponent's turn
@@ -288,3 +271,24 @@ class Game(db.Model):
       if diag.is_complete():
         return True
     return False
+  
+class Channel(db.Model):
+  id = db.Column(db.Integer, primary_key=True)
+
+  def __init__(self, ch_id):
+    self.channel_id = ch_id
+
+  def __repr__(self):
+    return "<Channel %r>" % self.ch_id
+
+class Player(db.Model):
+  id = db.Column(db.Integer, primary_key=True)
+  turn_rep = db.Column(db.Boolean)
+  username = db.Column(db.String)
+
+  def __init__(self, turn_rep, uname):
+    self.turn_rep = turn_rep
+    self.username = uname
+
+  def __repr__(self):
+    "<Player %r (@%r)>" % (UTIL.rep_to_piece(self.turn_rep), self.username)

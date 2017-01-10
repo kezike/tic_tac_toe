@@ -1,5 +1,6 @@
 import os
 import re
+import ttt_util
 from slackclient import SlackClient
 from flask import Flask, request, session, g, redirect, url_for, render_template, flash, jsonify, abort
 from flask_sqlalchemy import SQLAlchemy
@@ -8,9 +9,9 @@ app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["DATABASE_URL"]
 db = SQLAlchemy(app)
 
-# import ttt_rep
 this_game = None
 
+UTIL = ttt_util.Util()
 HOST = "/kayode-ezike-ttt.herokuapp.com"
 PORT = 5000
 APP_TOKEN = os.environ["APP_TOKEN"]
@@ -38,11 +39,11 @@ def uid_to_uname(uid):
   return None
 
 # Specifies response to start/restart command
-def start_handler(cmd_input, own_uid):  
+def start_handler(cmd_input, own_uid):
   board = this_game.board
   turn_rep = this_game.turn_rep
   # Confirm from user info in request payload
-  turn = this_game.rep_to_piece(turn_rep) 
+  turn = UTIL.rep_to_piece(turn_rep) 
   own_uname = uid_to_uname(own_uid)
   start_response = "```Turn: X (@" + own_uname + ")\n"
   # Regex for invoking default-size board (3 x 3)
@@ -115,19 +116,22 @@ def move_handler(cmd_input):
     return "```Position (FILE, RANK) is out of bounds! a <= FILE <= max(a, min(z, MAX_FILE)), where MAX_FILE is the largest lexicographical letter for the board's dimension.```"
   turn_rep = this_game.turn_rep
   # Confirm from user info in request payload
-  turn = this_game.rep_to_piece(turn_rep)
+  turn = UTIL.rep_to_piece(turn_rep)
   this_game.make_move(fil_str, rnk, turn)
   turn_rep = this_game.turn_rep
   # TODO - Calculate TURN_USERNAME
-  move_response = "```Turn: " + board.rep_to_piece(turn_rep) + " (@TURN_USERNAME)\n" + board.__str__()
+  move_response = "```Turn: " + UTIL.rep_to_piece(turn_rep) + " (@TURN_USERNAME)\n" + board.__str__()
   return move_response
 
 @app.route('/', methods=['POST'])
 def ttt_handler():
+  import ttt_rep
   token = request.form.get('token', None)
   command = request.form.get('command', None)
   command_input = request.form.get('text', None)
   user_id = request.form.get('user_id', None)
+  ch_id = request.form.get('channel_id', None)
+  channel_game_count = ttt_rep.Game.query.filter_by(channel_id=ch_id).count()
 
   # Validate parameters
   if not token or token != APP_TOKEN:
@@ -139,7 +143,7 @@ def ttt_handler():
   board = this_game.board
   turn_rep = this_game.turn_rep
   # Confirm from user info in request payload
-  turn = this_game.rep_to_piece(turn_rep)
+  turn = UTIL.rep_to_piece(turn_rep)
   if command == "/ttt":
     start_match = re.search("start", command_input)
     display_match = re.match("^display$", command_input) 
@@ -151,22 +155,24 @@ def ttt_handler():
       # TODO - Check if game already exists for channel
       # If not, set caller's piece to 'X',
       # set opponent's piece to 'O', and display board
+      if channel_game_count > 0:
+        return "```Game already in progress in current channel! Run '/ttt display' to display status of current game or '/ttt restart' to start new game.```"
       return start_handler(command_input, user_id)
     # Display board
     elif display_match:
-      if board == None:
+      if channel_game_count == 0:
         return "```Cannot display board before starting game. Type '/ttt start [DIM]' (where 1 <= DIM <= 26) to play a new game.```"
       # TODO - Calculate TURN_USERNAME
-      display_response = "```Turn: " + board.rep_to_piece(turn_rep) + " (@TURN_USERNAME)\n" + board.__str__()
+      display_response = "```Turn: " + UTIL.rep_to_piece(turn_rep) + " (@TURN_USERNAME)\n" + board.__str__()
       return display_response
     # Make move
     elif move_match:
-      if board == None:
+      if channel_game_count == 0:
         return "```Cannot make move before starting game. Type '/ttt start [DIM]' (where 1 <= DIM <= 26) to play a new game.```"
       return move_handler(command_input)
     # End game
     elif end_match:
-      if board == None:
+      if channel_game_count == 0:
         return "```Cannot end game before starting game. Type '/ttt start [DIM]' (where 1 <= DIM <= 26) to play a new game.```"
       # TODO - Update db with flushed board and features
       return "```Game Ended! Thanks for playing Tic Tac Toe :}```"
