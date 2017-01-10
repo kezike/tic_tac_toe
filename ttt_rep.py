@@ -4,9 +4,6 @@ import string
 import ttt_util
 
 UTIL = ttt_util.Util()
-ALPHA = string.ascii_lowercase
-NUM_LETTERS = len(ALPHA)
-INF = float("inf")
 
 # Represents a cell in a tic tac toe board
 class Cell(db.Model):

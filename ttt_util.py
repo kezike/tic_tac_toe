@@ -1,3 +1,7 @@
+ALPHA = string.ascii_lowercase
+NUM_LETTERS = len(ALPHA)
+INF = float("inf")
+
 def singleton(cls):
   instances = {}
   def getinstance():
