@@ -35,12 +35,12 @@ class Section:
     if val == 'X':
       self.cells.append(True)
       self.num_insertions += 1
-      self.matches = self.matches and (self.last_insertion or self.last_insertion == 30)
+      self.matches = self.matches and (self.last_insertion == True or self.last_insertion == 30)
       self.last_insertion = True
     elif val == 'O':
       self.cells.append(False)
       self.num_insertions += 1
-      self.matches = self.matches and (not self.last_insertion or self.last_insertion == 30)
+      self.matches = self.matches and (self.last_insertion == False or self.last_insertion == 30)
       self.last_insertion = False
   
   def is_complete(self):
