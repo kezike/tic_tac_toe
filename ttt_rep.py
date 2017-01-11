@@ -110,7 +110,6 @@ class Board:
       row = Row(self.NUM_COLS)
       for j in xrange(self.NUM_COLS):
         cell = Cell(i, j, ' ')
-        db.session.add(cell)
         self.rows.append(row)
         if j >= len(self.cols):
           col = Col(self.NUM_ROWS)
@@ -124,7 +123,6 @@ class Board:
             diag = Diag(self.NUM_COLS)
             self.diags.append(diag)
         self.cells.append(cell)
-    db.session.commit()
 
     # Calculate row delimiter in printed board: |---+---+---|
     self.row_delim = '|'
