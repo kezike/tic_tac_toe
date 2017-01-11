@@ -191,6 +191,9 @@ class Board:
     self.turn_rep = not self.turn_rep
     self.state_changed = True
 
+  def is_occupied(self, fil, rnk):
+    return self.get_cell(fil, rnk).value != ' '
+
   def __str__(self):
     if not self.state_changed:
       return self.board_str

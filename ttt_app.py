@@ -127,7 +127,7 @@ def move_handler(cmd_input, own_uid, ch_id):
   # Check if file and rank globally in bounds (within a-z and 1-26)
   move_bounds_match = re.match("^move [a-z]([1-9]|[1-2][0-6])$", cmd_input)
   if not move_bounds_match:
-    return "```Position (FILE, RANK) is out of bounds! a <= FILE <= max(a, min(z, MAX_FILE)), where MAX_FILE is the largest lexicographical letter for the board's dimension.```"
+    return "```Position (" + fil_str + ", " + rnk_str + ") is out of bounds! a <= FILE <= max(a, min(z, MAX_FILE)), where MAX_FILE is the largest lexicographical letter for the board's dimension.```"
   # Check if file and rank locally in bounds (within board dimensions)
   dim_str = str(this_board.NUM_ROWS)
   if this_board.NUM_ROWS < 10:
@@ -137,17 +137,20 @@ def move_handler(cmd_input, own_uid, ch_id):
     dim_sec_dig = dim_str[1]
     move_bounds_match = re.match("^move [a-" + this_board.MAX_FILE + "][1-" + dim_first_dig + ']' + "[0-" + dim_sec_dig + "]$", cmd_input)
   if not move_bounds_match:
-    return "```Position (FILE, RANK) is out of bounds! a <= FILE <= max(a, min(z, MAX_FILE)), where MAX_FILE is the largest lexicographical letter for the board's dimension.```"
+    return "```Position (" + fil_str + ", " + rnk_str + ") is out of bounds! a <= FILE <= max(a, min(z, MAX_FILE)), where MAX_FILE is the largest lexicographical letter for the board's dimension.```"
+  if this_board.is_occupied(fil_str, rnk_str):
+    return "```Position (" + fil_str + ", " + rnk_str + ") is occupied! Please try another position.```"
   # Confirm from user info in request payload
   this_game.make_move(fil_str, rnk, current_piece)
+  this_board_str = this_board.__str__()
   if this_game.is_over():
     outcome = this_game.report_outcome()
     this_game = None
     this_board = None
     if outcome == None:
       return "```Game Over! Cat's Game - both players win!```"
-    game_outcome = "```Player " + current_piece + " wins! " + "Congratulations @" + current_piece_uname + "!\n" + this_board.__str__()
-    return "```Game Over! Game Outcome:```\n" + game_outcome
+    game_outcome = "```Player " + current_piece + " wins! " + "Congratulations @" + current_piece_uname + "!\n" + this_board_str
+    return "```Game Over! Game Outcome Below```\n" + game_outcome
   new_piece_rep = this_game.turn_rep
   new_piece = UTIL.rep_to_piece(new_piece_rep)
   new_piece_uname = None
