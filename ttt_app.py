@@ -138,7 +138,7 @@ def move_handler(cmd_input, own_uid, ch_id):
     move_bounds_match = re.match("^move [a-" + this_board.MAX_FILE + "][1-" + dim_first_dig + ']' + "[0-" + dim_sec_dig + "]$", cmd_input)
   if not move_bounds_match:
     return "```Position (" + fil_str + ", " + rnk_str + ") is out of bounds! a <= FILE <= max(a, min(z, MAX_FILE)), where MAX_FILE is the largest lexicographical letter for the board's dimension.```"
-  if this_board.is_occupied(fil_str, rnk_str):
+  if this_board.is_occupied(fil_str, rnk):
     return "```Position (" + fil_str + ", " + rnk_str + ") is occupied! Please try another position.```"
   # Confirm from user info in request payload
   this_game.make_move(fil_str, rnk, current_piece)
