@@ -6,12 +6,9 @@ from slackclient import SlackClient
 from flask import Flask, request, session, g, redirect, url_for, render_template, flash, jsonify, abort
 from flask_sqlalchemy import SQLAlchemy
 
-logging.basicConfig()
-logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
-
 app = Flask(__name__)
 
-this_game = ttt_rep.Game()
+this_game = None
 this_board = None
 
 import ttt_util
@@ -55,7 +52,6 @@ def user_in_channel(uid, ch_id):
 
 # Specifies response to start/restart command
 def start_handler(cmd_input, own_uid, ch_id):
-  this_board = this_game.board
   player_x = ttt_rep.Player(True, own_uid)
   player_y = None # determined below
   own_uname = uid_to_uname(own_uid)
@@ -158,7 +154,6 @@ def ttt_handler():
       "response_type": "ephemeral",
       "text": "Your app is not entitled to access the '/ttt' bot! :P"
     })
-  this_board = this_game.board
   if command == "/ttt":
     start_match = re.search("start", command_input)
     display_match = re.match("^display$", command_input) 
