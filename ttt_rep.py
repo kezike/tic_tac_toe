@@ -235,6 +235,19 @@ class Game:
   def report_outcome(self):
     return self.outcome
 
+  def is_complete(self):
+    board_rows = self.board.rows
+    board_cols = self.board.cols
+    board_diags = self.board.diags
+    complete = True
+    for row in board_rows:
+      complete = complete and row.is_complete()
+    for col in board_cols:
+      complete = complete and col.is_complete()
+    for diag in board_diags:
+      complete = complete and diag.is_complete()
+    return complete
+
   def is_over(self):
     board_rows = self.board.rows
     board_cols = self.board.cols
@@ -244,26 +257,17 @@ class Game:
         if row.matches:
           self.outcome = row.last_insertion
           return True
-        self.complete = True
-      else:
-        self.is_complete = False
     for col in board_cols:
       if col.is_complete():
         if col.matches:
           self.outcome = col.last_insertion
           return True
-        self.complete = True
-      else:
-        self.complete = False
     for diag in board_diags:
       if diag.is_complete():
         if diag.matches:
           self.outcome = diag.last_insertion
           return True
-        self.complete = True
-      else:
-        self.complete = False
-    return self.complete
+    return self.is_complete()
   
 # Represents a player of tic tac toe
 class Player:
