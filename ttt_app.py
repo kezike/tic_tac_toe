@@ -146,7 +146,8 @@ def move_handler(cmd_input, own_uid, ch_id):
     this_board = None
     if outcome == None:
       return "```Game Over! Cat's Game - both players win!```"
-    return "```Game Over!" + "Player " + current_piece + "wins! " + "Congratulations @" + current_piece_uname + "!```"
+    game_outcome = "```Player " + current_piece + " wins! " + "Congratulations @" + current_piece_uname + "!\n" + this_board.__str__()
+    return "```Game Over! Game Outcome:```\n" + game_outcome
   new_piece_rep = this_game.turn_rep
   new_piece = UTIL.rep_to_piece(new_piece_rep)
   new_piece_uname = None
