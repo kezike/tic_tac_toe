@@ -73,6 +73,7 @@ def start_handler(cmd_input, own_uid, ch_id):
     if not user_in_channel(opp_uid, ch_id):
       return USER_NOT_IN_CHANNEL_ERROR
     start_response = "```@" + own_uname + " (X) is challenging @" + opp_uname + " (O) " + "to a game of Tic Tac Toe...```\n" + start_response
+    global this_game
     this_game = ttt_rep.Game(own_uid, opp_uid, ch_id, True)
     turn_rep = this_game.turn_rep
     # TODO - Confirm from user info in request payload
@@ -93,6 +94,7 @@ def start_handler(cmd_input, own_uid, ch_id):
     if not user_in_channel(opp_uid, ch_id):
       return USER_NOT_IN_CHANNEL_ERROR
     start_response = "```@" + uid_to_uname(own_uid) + " (X) is challenging @" + opp_uname + " (O) " + "to a game of tic tac toe...```\n" + start_response
+    global this_game
     this_game = ttt_rep.Game(own_uid, opp_uid, ch_id, True)
     turn_rep = this_game.turn_rep
     # TODO - Confirm from user info in request payload
@@ -158,6 +160,7 @@ def ttt_handler():
       "response_type": "ephemeral",
       "text": "Your app is not entitled to access the '/ttt' bot! :P"
     })
+  global this_game
   global this_board
   if command == "/ttt":
     start_match = re.search("start", command_input)
