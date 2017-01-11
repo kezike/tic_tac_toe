@@ -19,7 +19,7 @@ class Cell:
 # Represents a section in a tic tac toe board
 class Section:
   def __init__(self, num_cells):
-    # bit array representing 'X's (1), 'O's (0), and null (infinity)
+    # bit array representing 'X's (True), 'O's (False), and null (infinity)
     self.cells = []
     self.NUM_CELLS = num_cells
     self.num_insertions = 0
@@ -33,19 +33,22 @@ class Section:
 
   def insert(self, val):
     if val == 'X':
-      self.cells.append(1)
+      self.cells.append(True)
       self.num_insertions += 1
-      self.matches = self.matches and (self.last_insertion == 1 or self.last_insertion == 30)
-      self.last_insertion = 1
+      self.matches = self.matches and (self.last_insertion or self.last_insertion == 30)
+      self.last_insertion = True
     elif val == 'O':
-      self.cells.append(0)
+      self.cells.append(False)
       self.num_insertions += 1
-      self.matches = self.matches and (self.last_insertion == 0 or self.last_insertion == 30)
-      self.last_insertion = 0
+      self.matches = self.matches and (not self.last_insertion or self.last_insertion == 30)
+      self.last_insertion = False
   
+  def matches(self):
+    return self.matches
+
   def is_complete(self):
     # assumes NUM_CELLS will be set to nonzero value before called
-    return self.matches and self.num_insertions == self.NUM_CELLS
+    return self.num_insertions == self.NUM_CELLS
 
   def __str__(self):
     # TODO
@@ -225,11 +228,15 @@ class Game:
     self.channel_id = ch_id
     self.turn_rep = turn_rep
     self.board = None
+    self.outcome = None
   
   def make_move(self, fil, rnk, val):
     self.board.insert(fil, rnk, val)
     # Now opponent's turn
     self.turn_rep = not self.turn_rep
+
+  def report_outcome(self):
+    return self.outcome
 
   def is_over(self):
     board_rows = self.board.rows
@@ -237,14 +244,29 @@ class Game:
     board_diags = self.board.diags
     for row in board_rows:
       if row.is_complete():
-        return True
+        if row.matches():
+          self.outcome = row.last_insertion
+          return True
+        self.complete = True
+      else:
+        self.is_complete = False
     for col in board_cols:
       if col.is_complete():
-        return True
+        if col.matches():
+          self.outcome = col.last_insertion
+          return True
+        self.complete = True
+      else:
+        self.complete = False
     for diag in board_diags:
       if diag.is_complete():
-        return True
-    return False
+        if diag.matches():
+          self.outcome = diag.last_insertion
+          return True
+        self.complete = True
+      else:
+        self.complete = False
+    return self.complete
   
 # Represents a player of tic tac toe
 class Player:

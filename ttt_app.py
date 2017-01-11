@@ -113,7 +113,13 @@ def move_handler(cmd_input, own_uid, ch_id):
   global this_game
   global this_board
   this_board = this_game.board
-  turn_rep = this_game.turn_rep
+  piece_rep = this_game.turn_rep
+  current_piece = UTIL.rep_to_piece(piece_rep)
+  current_turn_uname = None
+  if piece_rep:
+    current_turn_uname = uid_to_uname(this_game.player_id_x)
+  else:
+    current_turn_uname = uid_to_uname(this_game.player_id_o)
   (move_cmd, fil_rnk_str) = cmd_input.split(' ')
   fil_str = fil_rnk_str[0]
   rnk_str = fil_rnk_str[1:]
@@ -132,17 +138,23 @@ def move_handler(cmd_input, own_uid, ch_id):
     move_bounds_match = re.match("^move [a-" + this_board.MAX_FILE + "][1-" + dim_first_dig + ']' + "[0-" + dim_sec_dig + "]$", cmd_input)
   if not move_bounds_match:
     return "```Position (FILE, RANK) is out of bounds! a <= FILE <= max(a, min(z, MAX_FILE)), where MAX_FILE is the largest lexicographical letter for the board's dimension.```"
-  turn_rep = this_game.turn_rep
   # Confirm from user info in request payload
-  turn = UTIL.rep_to_piece(turn_rep)
-  this_game.make_move(fil_str, rnk, turn)
-  turn_rep = this_game.turn_rep
-  turn_uname = None
-  if turn_rep:
-    turn_uname = uid_to_uname(this_game.player_id_x)
+  this_game.make_move(fil_str, rnk, piece)
+  if this_game.is_over():
+    outcome = this_game.report_outcome()
+    this_game = None
+    this_board = None
+    if outcome == None:
+      return "```Game Over! Cat's Game - both players win!```"
+    return "```Game Over! Congratulations " + '@' + current_turn_uname + " (Player " + piece + ")! You have won the game!```"
+  new_piece_rep = this_game.turn_rep
+  new_piece = UTIL.rep_to_piece(new_piece_rep)
+  new_turn_uname = None
+  if new_piece_rep:
+    new_turn_uname = uid_to_uname(this_game.player_id_x)
   else:
-    turn_uname = uid_to_uname(this_game.player_id_o)
-  move_response = "```Turn: " + UTIL.rep_to_piece(turn_rep) + " (@" + turn_uname + ")\n" + this_board.__str__()
+    new_turn_uname = uid_to_uname(this_game.player_id_o)
+  move_response = "```Turn: " + new_piece + " (@" + new_turn_uname + ")\n" + this_board.__str__()
   return move_response
 
 @app.route('/', methods=['POST'])
