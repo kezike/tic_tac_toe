@@ -10,10 +10,8 @@ logging.basicConfig()
 logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["DATABASE_URL"]
-db = SQLAlchemy(app)
 
-this_game = None
+this_game = ttt_rep.Game()
 this_board = None
 
 import ttt_util
@@ -57,6 +55,7 @@ def user_in_channel(uid, ch_id):
 
 # Specifies response to start/restart command
 def start_handler(cmd_input, own_uid, ch_id):
+  this_board = this_game.board
   player_x = ttt_rep.Player(True, own_uid)
   player_y = None # determined below
   own_uname = uid_to_uname(own_uid)
@@ -69,7 +68,6 @@ def start_handler(cmd_input, own_uid, ch_id):
     exact_restart_match = re.match("^restart @[a-z0-9][a-z0-9._-]*$", cmd_input)
     if exact_restart_match:
       # End current game and start new game
-      # TODO - Update db with flushed board and features and setup new board and features
       start_response = "```Ending current game and starting new game...```\n" + start_response
     # Default to 3 x 3 dimension
     (start_and_restart_cmd, uname_handle) = cmd_input.split(' ')
@@ -89,7 +87,6 @@ def start_handler(cmd_input, own_uid, ch_id):
     exact_restart_flex_match = re.match("^restart ([1-9]|[1-2][0-6])$", cmd_input)
     if exact_restart_flex_match:
       # End current game and start new game
-      # TODO - Update db with flushed board and features and setup new board and features
       start_response = "```Ending current game and starting new game with desired configuration...```\n" + start_response
     # Use desired board configuration
     (start_and_restart_cmd, dim, uname_handle) = cmd_input.split(' ')
@@ -108,13 +105,7 @@ def start_handler(cmd_input, own_uid, ch_id):
   else:
     # Command contains "start", but is not of a legal format
     return "```Illegal command format! Type '/ttt help' for legal command formatting.```"
-  # TODO - Calculate TURN_USERNAME
   start_response += this_board.__str__()
-  # db.session.merge(this_game)
-  # db.session.merge(this_board)
-  db.session.merge(player_x)
-  db.session.merge(player_y)
-  db.session.commit()
   return start_response
 
 # Specifies response to move command
@@ -154,7 +145,6 @@ def move_handler(cmd_input, own_uid, ch_id):
 
 @app.route('/', methods=['POST'])
 def ttt_handler():
-  import ttt_rep
   token = request.form.get('token', None)
   command = request.form.get('command', None)
   command_input = request.form.get('text', None)
@@ -168,6 +158,7 @@ def ttt_handler():
       "response_type": "ephemeral",
       "text": "Your app is not entitled to access the '/ttt' bot! :P"
     })
+  this_board = this_game.board
   if command == "/ttt":
     start_match = re.search("start", command_input)
     display_match = re.match("^display$", command_input) 
@@ -176,15 +167,13 @@ def ttt_handler():
     help_match = re.match("^help$", command_input)
     # Start game
     if start_match:
-      if this_game != None:
+      if this_board != None:
         return "```Game already in progress in current channel! Run '/ttt display' to display status of current game or '/ttt restart @SLACK_USERNAME' to start a new game.```"
       return start_handler(command_input, user_id, ch_id)
     # Display board
     elif display_match:
-      if this_game == None:
+      if this_board == None:
         return "```Cannot display board before starting game. Type '/ttt start [DIM] @SLACK_USERNAME' (where 1 <= DIM <= 26) to play a new game.```"
-      this_game = channel_games[0]
-      this_board = this_game.board
       turn_rep = this_game.turn_rep
       turn_uname = None
       if turn_rep:
@@ -195,14 +184,15 @@ def ttt_handler():
       return display_response
     # Make move
     elif move_match:
-      if this_game == None:
+      if this_board == None:
         return "```Cannot make move before starting game. Type '/ttt start [DIM] @SLACK_USERNAME' (where 1 <= DIM <= 26) to play a new game.```"
       return move_handler(command_input, user_id, ch_id)
     # End game
     elif end_match:
-      if this_game == None:
+      if this_board == None:
         return "```Cannot end game before starting game. Type '/ttt start [DIM] @SLACK_USERNAME' (where 1 <= DIM <= 26) to play a new game.```"
       this_game = None
+      this_board = None
       return "```Game Ended! Thanks for playing Tic Tac Toe :}```"
     # Display /ttt docs
     elif help_match:
