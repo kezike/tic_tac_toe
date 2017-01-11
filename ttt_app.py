@@ -1,5 +1,6 @@
 import os
 import re
+import ttt_rep
 import logging
 from slackclient import SlackClient
 from flask import Flask, request, session, g, redirect, url_for, render_template, flash, jsonify, abort
@@ -56,7 +57,6 @@ def user_in_channel(uid, ch_id):
 
 # Specifies response to start/restart command
 def start_handler(cmd_input, own_uid, ch_id):
-  import ttt_rep
   player_x = ttt_rep.Player(True, own_uid)
   player_y = None # determined below
   own_uname = uid_to_uname(own_uid)
@@ -119,14 +119,8 @@ def start_handler(cmd_input, own_uid, ch_id):
 
 # Specifies response to move command
 def move_handler(cmd_input, own_uid, ch_id):
-  import ttt_rep
-  this_game = ttt_rep.Game.query.filter_by(channel_id=ch_id).one()
-  this_player = ttt_rep.Player.query.filter_by(player_id=own_id).one()
-  piece_rep = this_player.piece_rep
   this_board = this_game.board
   turn_rep = this_game.turn_rep
-  if turn_rep != piece_rep:
-    return WRONG_USER_ERROR
   (move_cmd, fil_rnk_str) = cmd_input.split(' ')
   fil_str = fil_rnk_str[0]
   rnk_str = fil_rnk_str[1:]
@@ -155,9 +149,7 @@ def move_handler(cmd_input, own_uid, ch_id):
     turn_uname = uid_to_uname(this_game.player_id_x)
   else:
     turn_uname = uid_to_uname(this_game.player_id_o)
-  # TODO - Calculate TURN_USERNAME
   move_response = "```Turn: " + UTIL.rep_to_piece(turn_rep) + " (@" + turn_uname + ")\n" + this_board.__str__()
-  db.session.commit()
   return move_response
 
 @app.route('/', methods=['POST'])
@@ -168,9 +160,6 @@ def ttt_handler():
   command_input = request.form.get('text', None)
   user_id = request.form.get('user_id', None)
   ch_id = request.form.get('channel_id', None)
-  channel_games = ttt_rep.Game.query.filter_by(channel_id=ch_id)
-  channel_game_count = channel_games.count()
-  print "channel_game_count:", str(channel_game_count)
 
   # Validate parameters
   if not token or token != APP_TOKEN:
@@ -179,7 +168,6 @@ def ttt_handler():
       "response_type": "ephemeral",
       "text": "Your app is not entitled to access the '/ttt' bot! :P"
     })
-  # TODO - Confirm from user info in request payload
   if command == "/ttt":
     start_match = re.search("start", command_input)
     display_match = re.match("^display$", command_input) 
@@ -188,17 +176,13 @@ def ttt_handler():
     help_match = re.match("^help$", command_input)
     # Start game
     if start_match:
-      # TODO - Check if game already exists for channel
-      # If not, set caller's piece to 'X',
-      # set opponent's piece to 'O', and display board
-      if channel_game_count > 0:
+      if this_game != None:
         return "```Game already in progress in current channel! Run '/ttt display' to display status of current game or '/ttt restart @SLACK_USERNAME' to start a new game.```"
       return start_handler(command_input, user_id, ch_id)
     # Display board
     elif display_match:
-      if channel_game_count == 0:
+      if this_game == None:
         return "```Cannot display board before starting game. Type '/ttt start [DIM] @SLACK_USERNAME' (where 1 <= DIM <= 26) to play a new game.```"
-      # TODO - Calculate TURN_USERNAME
       this_game = channel_games[0]
       this_board = this_game.board
       turn_rep = this_game.turn_rep
@@ -211,14 +195,14 @@ def ttt_handler():
       return display_response
     # Make move
     elif move_match:
-      if channel_game_count == 0:
+      if this_game == None:
         return "```Cannot make move before starting game. Type '/ttt start [DIM] @SLACK_USERNAME' (where 1 <= DIM <= 26) to play a new game.```"
       return move_handler(command_input, user_id, ch_id)
     # End game
     elif end_match:
-      if channel_game_count == 0:
+      if this_game == None:
         return "```Cannot end game before starting game. Type '/ttt start [DIM] @SLACK_USERNAME' (where 1 <= DIM <= 26) to play a new game.```"
-      # TODO - Update db with flushed board and features
+      this_game = None
       return "```Game Ended! Thanks for playing Tic Tac Toe :}```"
     # Display /ttt docs
     elif help_match:

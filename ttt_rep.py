@@ -1,23 +1,14 @@
 from flask_sqlalchemy import SQLAlchemy
-from ttt_app import db
 import ttt_util
 
 UTIL = ttt_util.Util()
 
 # Represents a cell in a tic tac toe board
-class Cell(db.Model):
-  id = db.Column(db.Integer, primary_key=True)
-  value = db.Column(db.String(1))
-  row = db.Column(db.Integer)
-  col = db.Column(db.Integer)
-  board_id = db.Column(db.Integer, db.ForeignKey("board.id"))
-  board = db.relationship("Board", back_populates="cells")
-
-  def __init__(self, board, row, col, val):
+class Cell:
+  def __init__(self, row, col, val):
     self.row = row
     self.col = col
     self.value = val
-    self.board = board
 
   def insert(self, val):
     self.value = val
@@ -90,14 +81,7 @@ Tic Tac Toe
 1 |   |   |   |
     a   b   c 
 """
-class Board(db.Model):
-  id = db.Column(db.Integer, primary_key=True)
-  # game_id = db.Column(db.Integer, db.ForeignKey("game.id"))
-  game = db.relationship("Game", back_populates="board")
-  cells = db.relationship("Cell", back_populates="board")
-  turn_rep = db.Column(db.Boolean)
-  board_str = db.Column(db.String)
-
+class Board:
   def __init__(self, dim=3):
     self.DIM = dim
     self.NUM_ROWS = dim
@@ -209,9 +193,6 @@ class Board(db.Model):
     self.turn_rep = not self.turn_rep
     self.state_changed = True
 
-  def __repr__(self):
-    return "<Board %d x %d>" % (self.NUM_ROWS, self.NUM_COLS)
-
   def __str__(self):
     if not self.state_changed:
       return self.board_str
@@ -237,15 +218,7 @@ class Board(db.Model):
     return self.board_str
 
 # Represents a game of tic tac toe
-class Game(db.Model):
-  id = db.Column(db.Integer, primary_key=True)
-  player_id_x = db.Column(db.String)
-  player_id_o = db.Column(db.String)
-  channel_id = db.Column(db.String)
-  board_id = db.Column(db.Integer, db.ForeignKey("board.id"))
-  board = db.relationship("Board", uselist=False, back_populates="game")
-  turn_rep = db.Column(db.Boolean)
-  
+class Game:
   def __init__(self, pid_x, pid_o, ch_id, turn_rep):
     # Must initialize board with dimensions indicated
     # in game play or 3 x 3 if not indicated
@@ -276,14 +249,7 @@ class Game(db.Model):
     return False
   
 # Represents a player of tic tac toe
-class Player(db.Model):
-  id = db.Column(db.Integer, primary_key=True)
-  piece_rep = db.Column(db.Boolean)
-  player_id = db.Column(db.String)
-
+class Player:
   def __init__(self, piece_rep, pid):
     self.piece_rep = piece_rep
     self.player_id = pid
-
-  def __repr__(self):
-    "<Player %r (@%r)>" % (UTIL.rep_to_piece(self.turn_rep), self.username)
