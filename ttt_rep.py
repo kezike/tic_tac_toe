@@ -43,9 +43,6 @@ class Section:
       self.matches = self.matches and (not self.last_insertion or self.last_insertion == 30)
       self.last_insertion = False
   
-  def matches(self):
-    return self.matches
-
   def is_complete(self):
     # assumes NUM_CELLS will be set to nonzero value before called
     return self.num_insertions == self.NUM_CELLS
@@ -244,7 +241,7 @@ class Game:
     board_diags = self.board.diags
     for row in board_rows:
       if row.is_complete():
-        if row.matches():
+        if row.matches:
           self.outcome = row.last_insertion
           return True
         self.complete = True
@@ -252,7 +249,7 @@ class Game:
         self.is_complete = False
     for col in board_cols:
       if col.is_complete():
-        if col.matches():
+        if col.matches:
           self.outcome = col.last_insertion
           return True
         self.complete = True
@@ -260,7 +257,7 @@ class Game:
         self.complete = False
     for diag in board_diags:
       if diag.is_complete():
-        if diag.matches():
+        if diag.matches:
           self.outcome = diag.last_insertion
           return True
         self.complete = True
