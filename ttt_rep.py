@@ -109,7 +109,7 @@ class Board:
     for i in xrange(self.NUM_ROWS):
       row = Row(self.NUM_COLS)
       for j in xrange(self.NUM_COLS):
-        cell = Cell(self, i, j, ' ')
+        cell = Cell(i, j, ' ')
         db.session.add(cell)
         self.rows.append(row)
         if j >= len(self.cols):
