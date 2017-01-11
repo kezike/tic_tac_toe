@@ -106,6 +106,7 @@ def start_handler(cmd_input, own_uid, ch_id):
 
 # Specifies response to move command
 def move_handler(cmd_input, own_uid, ch_id):
+  global this_game
   this_board = this_game.board
   turn_rep = this_game.turn_rep
   (move_cmd, fil_rnk_str) = cmd_input.split(' ')
@@ -154,6 +155,7 @@ def ttt_handler():
       "response_type": "ephemeral",
       "text": "Your app is not entitled to access the '/ttt' bot! :P"
     })
+  global this_board
   if command == "/ttt":
     start_match = re.search("start", command_input)
     display_match = re.match("^display$", command_input) 
