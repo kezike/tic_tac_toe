@@ -78,7 +78,8 @@ def start_handler(cmd_input, own_uid, ch_id):
     # TODO - Confirm from user info in request payload
     turn = UTIL.rep_to_piece(turn_rep) 
     this_game.board = ttt_rep.Board(3)
-    global this_board = this_game.board
+    global this_board
+    this_board = this_game.board
   elif start_and_restart_flex_match:
     exact_restart_flex_match = re.match("^restart ([1-9]|[1-2][0-6])$", cmd_input)
     if exact_restart_flex_match:
@@ -97,7 +98,8 @@ def start_handler(cmd_input, own_uid, ch_id):
     # TODO - Confirm from user info in request payload
     turn = UTIL.rep_to_piece(turn_rep) 
     this_game.board = ttt_rep.Board(int(dim))
-    global this_board = this_game.board
+    global this_board
+    this_board = this_game.board
   else:
     # Command contains "start", but is not of a legal format
     return "```Illegal command format! Type '/ttt help' for legal command formatting.```"
@@ -107,7 +109,8 @@ def start_handler(cmd_input, own_uid, ch_id):
 # Specifies response to move command
 def move_handler(cmd_input, own_uid, ch_id):
   global this_game
-  global this_board = this_game.board
+  global this_board
+  this_board = this_game.board
   turn_rep = this_game.turn_rep
   (move_cmd, fil_rnk_str) = cmd_input.split(' ')
   fil_str = fil_rnk_str[0]
