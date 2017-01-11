@@ -11,7 +11,7 @@ class Cell(db.Model):
   row = db.Column(db.Integer)
   col = db.Column(db.Integer)
   board_id = db.Column(db.Integer, db.ForeignKey("board.id"))
-  board = db.relationship("Board") 
+  board = db.relationship("Board", backref="board")
 
   def __init__(self, board, row, col, val):
     self.row = row
@@ -22,11 +22,8 @@ class Cell(db.Model):
   def insert(self, val):
     self.value = val
 
-  def __repr__(self):
-    return '|', self.value, '|'
-
   def __str__(self):
-    return '|', self.value, '|'
+    return '| ' + self.value + ' |'
 
 # Represents a section in a tic tac toe board
 class Section:
@@ -95,8 +92,8 @@ Tic Tac Toe
 """
 class Board(db.Model):
   id = db.Column(db.Integer, primary_key=True)
-  game_id = db.Column(db.Integer, db.ForeignKey("game.id"))
-  game = db.relationship("Game")
+  # game_id = db.Column(db.Integer, db.ForeignKey("game.id"))
+  game = db.relationship("Game", backref="board")
   cells = db.relationship("Cell")
   turn_rep = db.Column(db.Boolean)
   board_str = db.Column(db.String)
@@ -246,7 +243,7 @@ class Game(db.Model):
   player_id_o = db.Column(db.String)
   channel_id = db.Column(db.String)
   board_id = db.Column(db.Integer, db.ForeignKey("board.id"))
-  board = db.relationship("Board", uselist=False)
+  board = db.relationship("Board", uselist=False, backref="game")
   turn_rep = db.Column(db.Boolean)
   
   def __init__(self, pid_x, pid_o, ch_id, turn_rep):
